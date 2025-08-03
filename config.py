@@ -1,0 +1,2 @@
+# Конфигурация бота
+BOT_TOKEN = 'your_token_here'
