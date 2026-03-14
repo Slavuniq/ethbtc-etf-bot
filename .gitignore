@@ -1,6 +1,0 @@
-.env
-bot_data.db
-bot.log
-photos/
-__pycache__/
-*.pyc
