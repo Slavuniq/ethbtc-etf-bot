@@ -1,4 +1,4 @@
-import asyncio, logging, os, shutil, uuid, tempfile, time, traceback
+import asyncio, logging, os, uuid, tempfile, time, traceback
 from PIL import Image
 from gradio_client import Client, handle_file
 import httpx
@@ -7,65 +7,37 @@ import config
 logger = logging.getLogger(__name__)
 
 JP = {
-    "necklace": "wearing a beautiful elegant necklace, photorealistic fashion photo",
-    "earrings": "wearing stylish earrings, photorealistic portrait",
-    "bracelet": "wearing an elegant bracelet, fashion photo",
-    "ring": "wearing a beautiful ring, close-up fashion photo",
-    "watch": "wearing a luxury wristwatch, fashion editorial",
-    "glasses": "wearing stylish sunglasses, photorealistic portrait",
+    "necklace": "a beautiful elegant necklace, jewelry product photo",
+    "earrings": "stylish earrings, jewelry product photo",
+    "bracelet": "an elegant bracelet, jewelry product photo",
+    "ring": "a beautiful ring, jewelry product photo",
+    "watch": "a luxury wristwatch, product photo",
+    "glasses": "stylish sunglasses, product photo",
 }
 
-# ---------- fallback HF spaces ----------
+# ---------- HF Spaces (порядок = приоритет) ----------
 
-CLOTHES_SPACES = [
-    "yisol/IDM-VTON",
-    "Nymbo/Virtual-Try-On",
-    "BestWishYsh/IDM-VTON",
-    "kadirnar/IDM-VTON",
+VTON_SPACES = [
+    "Nymbo/Virtual-Try-On",      # основной, подтверждённо работает
+    "yisol/IDM-VTON",            # оригинальный, часто спит
+    "kadirnar/IDM-VTON",         # клон, запасной
 ]
 
-JEWELRY_SPACES = [
-    config.HF_JEWELRY_SPACE,
-    "runwayml/stable-diffusion-inpainting",
-]
+# ---------- единая predict-функция ----------
 
-# ---------- space-specific predict functions ----------
-
-def _predict_idm_vton(client, prep_pp, prep_gp):
-    """Predict using yisol/IDM-VTON style API (named parameters)."""
+def _predict_vton(client, prep_pp, prep_gp, garment_des="a garment"):
+    """Вызов /tryon — единый API для всех IDM-VTON и Nymbo Spaces."""
     return client.predict(
         dict={"background": handle_file(prep_pp), "layers": [], "composite": None},
         garm_img=handle_file(prep_gp),
-        garment_des="a garment, high quality fashion photo",
+        garment_des=garment_des,
         is_checked=True,
-        is_checked_crop=True,
-        denoise_steps=50,
+        is_checked_crop=False,
+        denoise_steps=30,
         seed=42,
         api_name="/tryon",
     )
 
-
-def _predict_nymbo(client, prep_pp, prep_gp):
-    """Predict using Nymbo/Virtual-Try-On style API (positional parameters)."""
-    return client.predict(
-        {"background": handle_file(prep_pp), "layers": [], "composite": None},
-        handle_file(prep_gp),
-        "auto",     # masking mode
-        True,       # use auto mask
-        True,       # enhance output
-        30,         # denoising steps
-        42,         # seed
-        api_name="/tryon",
-    )
-
-
-# Mapping: space name → predict function
-SPACE_PREDICT = {
-    "yisol/IDM-VTON": _predict_idm_vton,
-    "Nymbo/Virtual-Try-On": _predict_nymbo,
-    "BestWishYsh/IDM-VTON": _predict_idm_vton,
-    "kadirnar/IDM-VTON": _predict_idm_vton,
-}
 
 # ---------- image preprocessing ----------
 
@@ -74,7 +46,7 @@ def _prepare_image(path: str, target_w: int, target_h: int) -> str:
     img = Image.open(path).convert("RGB")
     img = img.resize((target_w, target_h), Image.LANCZOS)
     tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
-    img.save(tmp.name, format="PNG", quality=100)
+    img.save(tmp.name, format="PNG")
     tmp.close()
     return tmp.name
 
@@ -123,8 +95,8 @@ def _download_url(url: str) -> str | None:
     """Download image from URL to a temp file."""
     try:
         logger.info(f"[VTON] Downloading result from URL: {url[:200]}")
-        with httpx.Client(timeout=60, follow_redirects=True) as client:
-            resp = client.get(url)
+        with httpx.Client(timeout=60, follow_redirects=True) as hc:
+            resp = hc.get(url)
             resp.raise_for_status()
         tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
         tmp.write(resp.content)
@@ -146,13 +118,12 @@ async def run_clothes_tryon(pp: str, gp: str):
         prep_gp = _prepare_image(gp, 768, 1024)
 
         try:
-            for sp in CLOTHES_SPACES:
-                predict_fn = SPACE_PREDICT.get(sp, _predict_idm_vton)
+            for sp in VTON_SPACES:
                 for attempt in range(2):
                     try:
                         logger.info(f"[VTON] Trying space: {sp} (attempt {attempt + 1})")
                         c = Client(sp, hf_token=config.HF_TOKEN)
-                        res = predict_fn(c, prep_pp, prep_gp)
+                        res = _predict_vton(c, prep_pp, prep_gp)
                         resolved = _resolve_result(res)
                         if resolved:
                             logger.info(f"[VTON] Success with {sp}")
@@ -169,7 +140,6 @@ async def run_clothes_tryon(pp: str, gp: str):
             logger.error("[VTON] All clothes try-on spaces failed!")
             return None
         finally:
-            # Clean up temp files
             for f in (prep_pp, prep_gp):
                 try:
                     os.unlink(f)
@@ -182,27 +152,20 @@ async def run_clothes_tryon(pp: str, gp: str):
 # ---------- jewelry try-on ----------
 
 async def run_jewelry_tryon(pp: str, jp: str, jt: str = "necklace"):
-    pr = JP.get(jt, f"wearing a {jt}, photorealistic")
+    """Jewelry try-on: используем тот же VTON Space, передавая фото украшения как garment."""
+    garment_des = JP.get(jt, f"a {jt}, product photo")
 
     def _r():
-        prep_pp = _prepare_image(pp, 512, 512)
+        prep_pp = _prepare_image(pp, 768, 1024)
+        prep_jp = _prepare_image(jp, 768, 1024)
 
         try:
-            for sp in JEWELRY_SPACES:
+            for sp in VTON_SPACES:
                 for attempt in range(2):
                     try:
                         logger.info(f"[Jewelry] Trying space: {sp} (attempt {attempt + 1})")
                         c = Client(sp, hf_token=config.HF_TOKEN)
-                        res = c.predict(
-                            prompt=pr,
-                            negative_prompt="blurry,deformed,ugly",
-                            image=handle_file(prep_pp),
-                            mask_image=handle_file(prep_pp),
-                            steps=35,
-                            guidance_scale=8.5,
-                            strength=0.4,
-                            api_name="/infer",
-                        )
+                        res = _predict_vton(c, prep_pp, prep_jp, garment_des=garment_des)
                         resolved = _resolve_result(res)
                         if resolved:
                             logger.info(f"[Jewelry] Success with {sp}")
@@ -219,10 +182,11 @@ async def run_jewelry_tryon(pp: str, jp: str, jt: str = "necklace"):
             logger.error("[Jewelry] All jewelry spaces failed!")
             return None
         finally:
-            try:
-                os.unlink(prep_pp)
-            except OSError:
-                pass
+            for f in (prep_pp, prep_jp):
+                try:
+                    os.unlink(f)
+                except OSError:
+                    pass
 
     return await asyncio.to_thread(_r)
 
