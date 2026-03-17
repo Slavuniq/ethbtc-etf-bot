@@ -124,8 +124,8 @@ async def _rg(msg:Message,state:FSMContext,uid:int,gp:str|None=None):
     d=await state.get_data();cat=d.get("category","clothes");jt=d.get("jewelry_type","necklace");pp=u["person_photo"]
     await state.set_state(S.processing);st=await msg.answer("✨ <b>Генерация запущена!</b>\n\n🧠 Нейросеть анализирует фигуру...\n⏳ 20–60 секунд")
     async def _t():
-        for s in["📐 Подбираем размер...","🎨 Примеряем на вас...","🖼 Финальная обработка..."]:
-            await asyncio.sleep(10)
+        for s in["📐 Подбираем размер...","🎨 Примеряем на вас...","🖼 Финальная обработка...","⚡ Почти готово...","🔄 Ещё немного..."]:
+            await asyncio.sleep(15)
             try:await st.edit_text(f"✨ <b>Генерация...</b>\n\n{s}\n⏳ Совсем скоро")
             except:pass
     tk=asyncio.create_task(_t())
@@ -133,7 +133,7 @@ async def _rg(msg:Message,state:FSMContext,uid:int,gp:str|None=None):
         rp=await run_clothes_tryon(pp,gp) if cat=="clothes" else await run_jewelry_tryon(pp,gp,jt)
     finally:tk.cancel()
     if not rp or not os.path.exists(rp):
-        await db.add_tries(uid,1);await st.edit_text("❌ <b>Не удалось создать примерку.</b>\n\nПопробуйте другое фото.\nПримерка возвращена.",reply_markup=km(True,u["tries_left"]));await state.set_state(S.ready);return
+        await db.add_tries(uid,1);u=await db.get_user(uid);await st.edit_text("❌ <b>Не удалось создать примерку.</b>\n\n🔄 Серверы нейросети перегружены или перезапускаются.\n\n<b>Что делать:</b>\n• Подождите 1-2 минуты и попробуйте снова\n• Попробуйте другое фото одежды\n• Фото одежды лучше на белом фоне\n\n✅ Примерка возвращена.",reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="🔁 Попробовать снова",callback_data="retry")],[InlineKeyboardButton(text="🏠 Меню",callback_data="main_menu")]]));await state.set_state(S.ready);return
     q=round(7.0+(hash(os.path.basename(rp))%30)/10,1);await db.save_generation(uid,cat,gp,rp,q);u=await db.get_user(uid)
     try:await st.delete()
     except:pass

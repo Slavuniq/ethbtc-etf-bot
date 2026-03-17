@@ -1,6 +1,7 @@
-import asyncio, logging, os, shutil, uuid, tempfile
+import asyncio, logging, os, shutil, uuid, tempfile, time, traceback
 from PIL import Image
 from gradio_client import Client, handle_file
+import httpx
 import config
 
 logger = logging.getLogger(__name__)
@@ -14,6 +15,20 @@ JP = {
     "glasses": "wearing stylish sunglasses, photorealistic portrait",
 }
 
+# ---------- fallback HF spaces ----------
+
+CLOTHES_SPACES = [
+    config.HF_TRYON_SPACE,       # yisol/IDM-VTON
+    "Nymbo/Virtual-Try-On",
+    "BestWishYsh/IDM-VTON",
+    "Xenova/IDM-VTON",
+]
+
+JEWELRY_SPACES = [
+    config.HF_JEWELRY_SPACE,     # multimodalart/stable-diffusion-inpainting
+    "runwayml/stable-diffusion-inpainting",
+]
+
 # ---------- image preprocessing ----------
 
 def _prepare_image(path: str, target_w: int, target_h: int) -> str:
@@ -26,6 +41,65 @@ def _prepare_image(path: str, target_w: int, target_h: int) -> str:
     return tmp.name
 
 
+# ---------- result resolver ----------
+
+def _resolve_result(res) -> str | None:
+    """Extract a usable file path or URL from various gradio result formats."""
+    logger.info(f"[VTON] Raw result type={type(res).__name__}, value={str(res)[:500]}")
+
+    # Unwrap list/tuple — take first element
+    if isinstance(res, (list, tuple)):
+        if len(res) == 0:
+            return None
+        res = res[0]
+
+    # Dict with path/url/image keys
+    if isinstance(res, dict):
+        for key in ("path", "url", "image", "name"):
+            val = res.get(key)
+            if val:
+                res = val
+                break
+        else:
+            logger.warning(f"[VTON] Dict result has no usable key: {res.keys()}")
+            return None
+
+    # At this point res should be a string
+    if not isinstance(res, str):
+        logger.warning(f"[VTON] Unexpected result type after unwrap: {type(res)}")
+        return None
+
+    # If it's a local file path that exists — use it directly
+    if os.path.exists(res):
+        return res
+
+    # If it looks like a URL — download it
+    if res.startswith("http://") or res.startswith("https://"):
+        return _download_url(res)
+
+    logger.warning(f"[VTON] Result string is neither a file nor URL: {res[:200]}")
+    return None
+
+
+def _download_url(url: str) -> str | None:
+    """Download image from URL to a temp file."""
+    try:
+        logger.info(f"[VTON] Downloading result from URL: {url[:200]}")
+        with httpx.Client(timeout=60, follow_redirects=True) as client:
+            resp = client.get(url)
+            resp.raise_for_status()
+        tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+        tmp.write(resp.content)
+        tmp.close()
+        # Verify it's a valid image
+        img = Image.open(tmp.name)
+        img.verify()
+        return tmp.name
+    except Exception as e:
+        logger.error(f"[VTON] Failed to download URL: {e}")
+        return None
+
+
 # ---------- clothes try-on ----------
 
 async def run_clothes_tryon(pp: str, gp: str):
@@ -34,31 +108,36 @@ async def run_clothes_tryon(pp: str, gp: str):
         prep_pp = _prepare_image(pp, 768, 1024)
         prep_gp = _prepare_image(gp, 768, 1024)
 
-        spaces = [config.HF_TRYON_SPACE, "Nymbo/Virtual-Try-On"]
-        for sp in spaces:
-            try:
-                logger.info(f"[VTON] Trying space: {sp}")
-                c = Client(sp)
-                res = c.predict(
-                    dict={"background": handle_file(prep_pp), "layers": [], "composite": None},
-                    garm_img=handle_file(prep_gp),
-                    garment_des="a garment, high quality fashion photo",
-                    is_checked=True,
-                    is_checked_crop=True,
-                    denoise_steps=50,
-                    seed=42,
-                    api_name="/tryon",
-                )
-                if isinstance(res, (list, tuple)) and len(res) >= 1:
-                    op = res[0]
-                    if isinstance(op, dict):
-                        op = op.get("path") or op.get("url")
-                    if op and os.path.exists(str(op)):
+        for sp in CLOTHES_SPACES:
+            for attempt in range(2):  # 1 retry per space
+                try:
+                    logger.info(f"[VTON] Trying space: {sp} (attempt {attempt + 1})")
+                    c = Client(sp, hf_token=None)
+                    res = c.predict(
+                        dict={"background": handle_file(prep_pp), "layers": [], "composite": None},
+                        garm_img=handle_file(prep_gp),
+                        garment_des="a garment, high quality fashion photo",
+                        is_checked=True,
+                        is_checked_crop=True,
+                        denoise_steps=50,
+                        seed=42,
+                        api_name="/tryon",
+                    )
+                    resolved = _resolve_result(res)
+                    if resolved:
                         logger.info(f"[VTON] Success with {sp}")
-                        return _save_result(str(op))
-            except Exception as e:
-                logger.error(f"[VTON] {sp} failed: {e}")
-                continue
+                        return _save_result(resolved)
+                    else:
+                        logger.warning(f"[VTON] {sp} returned empty/invalid result")
+                except Exception as e:
+                    logger.error(f"[VTON] {sp} attempt {attempt + 1} failed: {e}")
+                    logger.debug(traceback.format_exc())
+                    if attempt == 0:
+                        time.sleep(5)  # Wait before retry
+                    continue
+
+        # All spaces failed — log summary
+        logger.error("[VTON] All clothes try-on spaces failed!")
         return None
 
     return await asyncio.to_thread(_r)
@@ -71,27 +150,37 @@ async def run_jewelry_tryon(pp: str, jp: str, jt: str = "necklace"):
 
     def _r():
         prep_pp = _prepare_image(pp, 512, 512)
-        try:
-            c = Client(config.HF_JEWELRY_SPACE)
-            res = c.predict(
-                prompt=pr,
-                negative_prompt="blurry,deformed,ugly",
-                image=handle_file(prep_pp),
-                mask_image=handle_file(prep_pp),
-                steps=35,
-                guidance_scale=8.5,
-                strength=0.4,
-                api_name="/infer",
-            )
-            out = res[0] if isinstance(res, (list, tuple)) else res
-            if isinstance(out, dict):
-                out = out.get("path") or out.get("url") or out.get("image")
-            if out and os.path.exists(str(out)):
-                return _save_result(str(out))
-            return None
-        except Exception as e:
-            logger.error(f"[Jewelry] {e}")
-            return None
+
+        for sp in JEWELRY_SPACES:
+            for attempt in range(2):
+                try:
+                    logger.info(f"[Jewelry] Trying space: {sp} (attempt {attempt + 1})")
+                    c = Client(sp, hf_token=None)
+                    res = c.predict(
+                        prompt=pr,
+                        negative_prompt="blurry,deformed,ugly",
+                        image=handle_file(prep_pp),
+                        mask_image=handle_file(prep_pp),
+                        steps=35,
+                        guidance_scale=8.5,
+                        strength=0.4,
+                        api_name="/infer",
+                    )
+                    resolved = _resolve_result(res)
+                    if resolved:
+                        logger.info(f"[Jewelry] Success with {sp}")
+                        return _save_result(resolved)
+                    else:
+                        logger.warning(f"[Jewelry] {sp} returned empty/invalid result")
+                except Exception as e:
+                    logger.error(f"[Jewelry] {sp} attempt {attempt + 1} failed: {e}")
+                    logger.debug(traceback.format_exc())
+                    if attempt == 0:
+                        time.sleep(5)
+                    continue
+
+        logger.error("[Jewelry] All jewelry spaces failed!")
+        return None
 
     return await asyncio.to_thread(_r)
 
