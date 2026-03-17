@@ -18,16 +18,54 @@ JP = {
 # ---------- fallback HF spaces ----------
 
 CLOTHES_SPACES = [
-    config.HF_TRYON_SPACE,       # yisol/IDM-VTON
+    "yisol/IDM-VTON",
     "Nymbo/Virtual-Try-On",
     "BestWishYsh/IDM-VTON",
-    "Xenova/IDM-VTON",
+    "kadirnar/IDM-VTON",
 ]
 
 JEWELRY_SPACES = [
-    config.HF_JEWELRY_SPACE,     # multimodalart/stable-diffusion-inpainting
+    config.HF_JEWELRY_SPACE,
     "runwayml/stable-diffusion-inpainting",
 ]
+
+# ---------- space-specific predict functions ----------
+
+def _predict_idm_vton(client, prep_pp, prep_gp):
+    """Predict using yisol/IDM-VTON style API (named parameters)."""
+    return client.predict(
+        dict={"background": handle_file(prep_pp), "layers": [], "composite": None},
+        garm_img=handle_file(prep_gp),
+        garment_des="a garment, high quality fashion photo",
+        is_checked=True,
+        is_checked_crop=True,
+        denoise_steps=50,
+        seed=42,
+        api_name="/tryon",
+    )
+
+
+def _predict_nymbo(client, prep_pp, prep_gp):
+    """Predict using Nymbo/Virtual-Try-On style API (positional parameters)."""
+    return client.predict(
+        {"background": handle_file(prep_pp), "layers": [], "composite": None},
+        handle_file(prep_gp),
+        "auto",     # masking mode
+        True,       # use auto mask
+        True,       # enhance output
+        30,         # denoising steps
+        42,         # seed
+        api_name="/tryon",
+    )
+
+
+# Mapping: space name → predict function
+SPACE_PREDICT = {
+    "yisol/IDM-VTON": _predict_idm_vton,
+    "Nymbo/Virtual-Try-On": _predict_nymbo,
+    "BestWishYsh/IDM-VTON": _predict_idm_vton,
+    "kadirnar/IDM-VTON": _predict_idm_vton,
+}
 
 # ---------- image preprocessing ----------
 
@@ -55,13 +93,13 @@ def _resolve_result(res) -> str | None:
 
     # Dict with path/url/image keys
     if isinstance(res, dict):
-        for key in ("path", "url", "image", "name"):
+        for key in ("path", "url", "image", "name", "value"):
             val = res.get(key)
             if val:
                 res = val
                 break
         else:
-            logger.warning(f"[VTON] Dict result has no usable key: {res.keys()}")
+            logger.warning(f"[VTON] Dict result has no usable key: {list(res.keys())}")
             return None
 
     # At this point res should be a string
@@ -104,41 +142,39 @@ def _download_url(url: str) -> str | None:
 
 async def run_clothes_tryon(pp: str, gp: str):
     def _r():
-        # Prepare images: IDM-VTON expects 768x1024
         prep_pp = _prepare_image(pp, 768, 1024)
         prep_gp = _prepare_image(gp, 768, 1024)
 
-        for sp in CLOTHES_SPACES:
-            for attempt in range(2):  # 1 retry per space
-                try:
-                    logger.info(f"[VTON] Trying space: {sp} (attempt {attempt + 1})")
-                    c = Client(sp, hf_token=None)
-                    res = c.predict(
-                        dict={"background": handle_file(prep_pp), "layers": [], "composite": None},
-                        garm_img=handle_file(prep_gp),
-                        garment_des="a garment, high quality fashion photo",
-                        is_checked=True,
-                        is_checked_crop=True,
-                        denoise_steps=50,
-                        seed=42,
-                        api_name="/tryon",
-                    )
-                    resolved = _resolve_result(res)
-                    if resolved:
-                        logger.info(f"[VTON] Success with {sp}")
-                        return _save_result(resolved)
-                    else:
-                        logger.warning(f"[VTON] {sp} returned empty/invalid result")
-                except Exception as e:
-                    logger.error(f"[VTON] {sp} attempt {attempt + 1} failed: {e}")
-                    logger.debug(traceback.format_exc())
-                    if attempt == 0:
-                        time.sleep(5)  # Wait before retry
-                    continue
+        try:
+            for sp in CLOTHES_SPACES:
+                predict_fn = SPACE_PREDICT.get(sp, _predict_idm_vton)
+                for attempt in range(2):
+                    try:
+                        logger.info(f"[VTON] Trying space: {sp} (attempt {attempt + 1})")
+                        c = Client(sp, hf_token=config.HF_TOKEN)
+                        res = predict_fn(c, prep_pp, prep_gp)
+                        resolved = _resolve_result(res)
+                        if resolved:
+                            logger.info(f"[VTON] Success with {sp}")
+                            return _save_result(resolved)
+                        else:
+                            logger.warning(f"[VTON] {sp} returned empty/invalid result")
+                    except Exception as e:
+                        logger.error(f"[VTON] {sp} attempt {attempt + 1} failed: {type(e).__name__}: {e}")
+                        logger.debug(traceback.format_exc())
+                        if attempt == 0:
+                            time.sleep(5)
+                        continue
 
-        # All spaces failed — log summary
-        logger.error("[VTON] All clothes try-on spaces failed!")
-        return None
+            logger.error("[VTON] All clothes try-on spaces failed!")
+            return None
+        finally:
+            # Clean up temp files
+            for f in (prep_pp, prep_gp):
+                try:
+                    os.unlink(f)
+                except OSError:
+                    pass
 
     return await asyncio.to_thread(_r)
 
@@ -151,36 +187,42 @@ async def run_jewelry_tryon(pp: str, jp: str, jt: str = "necklace"):
     def _r():
         prep_pp = _prepare_image(pp, 512, 512)
 
-        for sp in JEWELRY_SPACES:
-            for attempt in range(2):
-                try:
-                    logger.info(f"[Jewelry] Trying space: {sp} (attempt {attempt + 1})")
-                    c = Client(sp, hf_token=None)
-                    res = c.predict(
-                        prompt=pr,
-                        negative_prompt="blurry,deformed,ugly",
-                        image=handle_file(prep_pp),
-                        mask_image=handle_file(prep_pp),
-                        steps=35,
-                        guidance_scale=8.5,
-                        strength=0.4,
-                        api_name="/infer",
-                    )
-                    resolved = _resolve_result(res)
-                    if resolved:
-                        logger.info(f"[Jewelry] Success with {sp}")
-                        return _save_result(resolved)
-                    else:
-                        logger.warning(f"[Jewelry] {sp} returned empty/invalid result")
-                except Exception as e:
-                    logger.error(f"[Jewelry] {sp} attempt {attempt + 1} failed: {e}")
-                    logger.debug(traceback.format_exc())
-                    if attempt == 0:
-                        time.sleep(5)
-                    continue
+        try:
+            for sp in JEWELRY_SPACES:
+                for attempt in range(2):
+                    try:
+                        logger.info(f"[Jewelry] Trying space: {sp} (attempt {attempt + 1})")
+                        c = Client(sp, hf_token=config.HF_TOKEN)
+                        res = c.predict(
+                            prompt=pr,
+                            negative_prompt="blurry,deformed,ugly",
+                            image=handle_file(prep_pp),
+                            mask_image=handle_file(prep_pp),
+                            steps=35,
+                            guidance_scale=8.5,
+                            strength=0.4,
+                            api_name="/infer",
+                        )
+                        resolved = _resolve_result(res)
+                        if resolved:
+                            logger.info(f"[Jewelry] Success with {sp}")
+                            return _save_result(resolved)
+                        else:
+                            logger.warning(f"[Jewelry] {sp} returned empty/invalid result")
+                    except Exception as e:
+                        logger.error(f"[Jewelry] {sp} attempt {attempt + 1} failed: {type(e).__name__}: {e}")
+                        logger.debug(traceback.format_exc())
+                        if attempt == 0:
+                            time.sleep(5)
+                        continue
 
-        logger.error("[Jewelry] All jewelry spaces failed!")
-        return None
+            logger.error("[Jewelry] All jewelry spaces failed!")
+            return None
+        finally:
+            try:
+                os.unlink(prep_pp)
+            except OSError:
+                pass
 
     return await asyncio.to_thread(_r)
 
@@ -190,7 +232,6 @@ async def run_jewelry_tryon(pp: str, jp: str, jt: str = "necklace"):
 def _save_result(src: str) -> str:
     os.makedirs(os.path.join(config.PHOTOS_DIR, "results"), exist_ok=True)
     dest = os.path.join(config.PHOTOS_DIR, "results", f"result_{uuid.uuid4().hex[:10]}.png")
-    # Re-save as PNG for maximum quality
     img = Image.open(src).convert("RGB")
     img.save(dest, format="PNG")
     return dest
