@@ -1,4 +1,5 @@
 import asyncio,logging,os,uuid
+from PIL import Image
 from aiogram import Bot,Dispatcher,F,Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -35,7 +36,15 @@ def kb():
 def ed():
     for d in("persons","garments","results"):os.makedirs(os.path.join(config.PHOTOS_DIR,d),exist_ok=True)
 async def dp_photo(msg,sub):
-    p=msg.photo[-1];fi=await bot.get_file(p.file_id);nm=f"{msg.from_user.id}_{uuid.uuid4().hex[:8]}.jpg";path=os.path.join(config.PHOTOS_DIR,sub,nm);await bot.download_file(fi.file_path,path);return path
+    p=msg.photo[-1];fi=await bot.get_file(p.file_id);nm=f"{msg.from_user.id}_{uuid.uuid4().hex[:8]}.png";path=os.path.join(config.PHOTOS_DIR,sub,nm);tmp=path.replace(".png",".tmp.jpg");await bot.download_file(fi.file_path,tmp);img=Image.open(tmp).convert("RGB");img.save(path,format="PNG");os.remove(tmp);return path
+async def dp_doc(msg,sub):
+    """Download photo sent as document (uncompressed)."""
+    doc=msg.document;fi=await bot.get_file(doc.file_id);nm=f"{msg.from_user.id}_{uuid.uuid4().hex[:8]}.png";path=os.path.join(config.PHOTOS_DIR,sub,nm);tmp=path.replace(".png",".tmp");await bot.download_file(fi.file_path,tmp);img=Image.open(tmp).convert("RGB");img.save(path,format="PNG");os.remove(tmp);return path
+def _is_image_doc(msg):
+    """Check if message has a document that is an image."""
+    if not msg.document:return False
+    mt=msg.document.mime_type or ""
+    return mt.startswith("image/")
 @router.message(CommandStart())
 async def cmd_start(msg:Message,state:FSMContext):
     uid=msg.from_user.id;nm=msg.from_user.full_name or "пользователь";ref=None
@@ -58,10 +67,14 @@ async def cmd_start(msg:Message,state:FSMContext):
     await msg.answer(f"👗 <b>AI Try-On — виртуальная примерка!</b>\n\n1️⃣ Загрузите своё фото\n2️⃣ Отправьте фото вещи\n3️⃣ Получите AI-результат!\n\n🎁 Примерок: <b>{u['tries_left']}</b>",reply_markup=km(hp,u["tries_left"]))
 @router.callback_query(F.data.in_({"upload_photo","change_photo"}))
 async def cb_up(cb:CallbackQuery,state:FSMContext):
-    await cb.answer();await cb.message.answer("📸 <b>Отправьте своё фото</b>\n\n• В полный рост или по пояс\n• Нейтральный фон\n• Хорошее освещение");await state.set_state(S.wait_person)
+    await cb.answer();await cb.message.answer("📸 <b>Отправьте своё фото</b>\n\n• В полный рост или по пояс\n• Нейтральный фон\n• Хорошее освещение\n\n💡 <i>Совет: для лучшего качества отправьте как файл (📎 → Файл)</i>");await state.set_state(S.wait_person)
 @router.message(S.wait_person,F.photo)
 async def gpp(msg:Message,state:FSMContext):
     p=await dp_photo(msg,"persons");await db.update_person_photo(msg.from_user.id,p);u=await db.get_user(msg.from_user.id);await msg.answer("✅ <b>Фото сохранено!</b>\n\nТеперь отправьте фото одежды или украшения.",reply_markup=km(True,u["tries_left"]));await state.set_state(S.ready)
+@router.message(S.wait_person,F.document)
+async def gpp_doc(msg:Message,state:FSMContext):
+    if not _is_image_doc(msg):await msg.answer("⚠️ Отправьте изображение (JPEG/PNG).");return
+    p=await dp_doc(msg,"persons");await db.update_person_photo(msg.from_user.id,p);u=await db.get_user(msg.from_user.id);await msg.answer("✅ <b>Фото сохранено (высокое качество)!</b>\n\nТеперь отправьте фото одежды или украшения.",reply_markup=km(True,u["tries_left"]));await state.set_state(S.ready)
 @router.message(S.wait_person)
 async def wpw(msg:Message):await msg.answer("⚠️ Отправьте именно <b>фото</b>.")
 async def _cp2(cb:CallbackQuery):
@@ -85,6 +98,10 @@ async def cjt(cb:CallbackQuery,state:FSMContext):
     jt=cb.data[2:];names={"necklace":"ожерелье","earrings":"серьги","watch":"часы","ring":"кольцо","bracelet":"браслет","glasses":"очки"};await state.update_data(category="jewelry",jewelry_type=jt);await cb.message.answer(f"💎 <b>Примерка: {names.get(jt,jt)}</b>\n\nОтправьте фото украшения.");await state.set_state(S.wait_garment)
 @router.message(S.wait_garment,F.photo)
 async def ggp(msg:Message,state:FSMContext):await _rg(msg,state,msg.from_user.id)
+@router.message(S.wait_garment,F.document)
+async def ggp_doc(msg:Message,state:FSMContext):
+    if not _is_image_doc(msg):await msg.answer("⚠️ Отправьте изображение (JPEG/PNG).");return
+    gp=await dp_doc(msg,"garments");await _rg(msg,state,msg.from_user.id,gp)
 @router.message(S.wait_garment)
 async def wgw(msg:Message):await msg.answer("⚠️ Отправьте именно <b>фото</b> вещи.")
 @router.message(S.ready,F.photo)
@@ -121,6 +138,7 @@ async def _rg(msg:Message,state:FSMContext,uid:int,gp:str|None=None):
     try:await st.delete()
     except:pass
     await msg.answer_photo(FSInputFile(rp),caption=f"🔥 <b>Вот как это выглядит!</b>\n\n📊 Качество: <b>{q}/10</b>\n💎 Осталось примерок: <b>{u['tries_left']}</b>",reply_markup=kr())
+    await msg.answer_document(FSInputFile(rp),caption="📎 Полное качество (без сжатия)")
     await state.update_data(last_result=rp);await state.set_state(S.ready)
 @router.callback_query(F.data=="save_result")
 async def cs(cb:CallbackQuery):await cb.answer("✅ Сохранено!",show_alert=False)
@@ -181,6 +199,15 @@ async def fp(msg:Message,state:FSMContext):
         p=await dp_photo(msg,"persons");await db.update_person_photo(msg.from_user.id,p);await msg.answer("✅ Фото сохранено! Теперь отправьте фото одежды или украшения.",reply_markup=km(True,u["tries_left"]));await state.set_state(S.ready)
     else:
         p=await dp_photo(msg,"garments");await state.update_data(pending_garment=p);await state.set_state(S.ready);await msg.answer("🤔 Что это?",reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="👗 Одежда",callback_data="qcat_clothes"),InlineKeyboardButton(text="💎 Украшение",callback_data="qcat_jewelry")]]))
+@router.message(F.document)
+async def fp_doc(msg:Message,state:FSMContext):
+    if not _is_image_doc(msg):return
+    u=await db.get_user(msg.from_user.id)
+    if not u:await cmd_start(msg,state);return
+    if not u.get("person_photo"):
+        p=await dp_doc(msg,"persons");await db.update_person_photo(msg.from_user.id,p);await msg.answer("✅ Фото сохранено (высокое качество)! Теперь отправьте фото одежды или украшения.",reply_markup=km(True,u["tries_left"]));await state.set_state(S.ready)
+    else:
+        p=await dp_doc(msg,"garments");await state.update_data(pending_garment=p);await state.set_state(S.ready);await msg.answer("🤔 Что это?",reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="👗 Одежда",callback_data="qcat_clothes"),InlineKeyboardButton(text="💎 Украшение",callback_data="qcat_jewelry")]]))
 @router.message(F.text)
 async def ft(msg:Message,state:FSMContext):
     u=await db.get_user(msg.from_user.id)
