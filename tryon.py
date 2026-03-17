@@ -10,7 +10,7 @@ async def run_clothes_tryon(pp,gp):
             try:
                 logger.info(f"[VTON] Trying space: {sp}")
                 c=Client(sp)
-                res=c.predict(dict={"background":handle_file(pp),"layers":[],"composite":None},garm_img=handle_file(gp),garment_des="clothing item",is_checked=True,is_checked_crop=False,denoise_steps=30,seed=42,api_name="/tryon")
+                res=c.predict(dict={"background":handle_file(pp),"layers":[],"composite":None},garm_img=handle_file(gp),garment_des="a garment, high quality fashion photo",is_checked=True,is_checked_crop=True,denoise_steps=40,seed=42,api_name="/tryon")
                 if isinstance(res,(list,tuple)) and len(res)>=1:
                     op=res[0]
                     if isinstance(op,dict): op=op.get("path") or op.get("url")
