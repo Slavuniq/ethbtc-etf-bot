@@ -1,0 +1,14 @@
+# KPI Dashboard Tracker for @manokhina_ai Launch
+# ------------------------------------------------
+# This project uses only the Python standard library.
+# No third-party packages are required.
+#
+# Python >= 3.8 is recommended.
+#
+# The script reads JSON data and generates a self-contained HTML file.
+# To run:
+#   python kpi_tracker.py --data sample_data.json --output dashboard.html
+#
+# Optional: if you want to serve the dashboard locally you can use:
+#   python -m http.server 8000
+# then open http://localhost:8000/dashboard.html

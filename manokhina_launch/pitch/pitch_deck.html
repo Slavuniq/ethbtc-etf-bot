@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pitch Deck — Polina Manokhina x Producer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#e8e8e8;overflow:hidden;height:100vh;width:100vw}
+.slide{position:absolute;top:0;left:0;width:100vw;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 80px;opacity:0;transform:translateX(100px);transition:all 0.6s cubic-bezier(0.4,0,0.2,1);pointer-events:none}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:all}
+.slide.prev{opacity:0;transform:translateX(-100px)}
+
+/* Navigation */
+.nav{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:100}
+.nav-dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.2);cursor:pointer;transition:all 0.3s}
+.nav-dot.active{background:#d4a44a;transform:scale(1.3)}
+.slide-counter{position:fixed;top:30px;right:40px;font-size:14px;color:rgba(255,255,255,0.4);z-index:100}
+.arrows{position:fixed;bottom:28px;right:40px;display:flex;gap:10px;z-index:100}
+.arrows button{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;width:40px;height:40px;border-radius:8px;cursor:pointer;font-size:18px;transition:all 0.2s}
+.arrows button:hover{background:rgba(212,164,74,0.3);border-color:#d4a44a}
+.logo-top{position:fixed;top:30px;left:40px;font-size:14px;font-weight:600;color:#d4a44a;z-index:100;letter-spacing:1px}
+
+/* Typography */
+h1{font-size:52px;font-weight:900;line-height:1.1;margin-bottom:20px;background:linear-gradient(135deg,#fff 0%,#d4a44a 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:38px;font-weight:700;margin-bottom:30px;color:#fff}
+h3{font-size:24px;font-weight:600;color:#d4a44a;margin-bottom:15px}
+p{font-size:18px;line-height:1.6;color:rgba(255,255,255,0.8)}
+.subtitle{font-size:22px;color:rgba(255,255,255,0.6);margin-bottom:40px;font-weight:300}
+.gold{color:#d4a44a}
+.big-number{font-size:72px;font-weight:900;color:#d4a44a;line-height:1}
+.medium-number{font-size:48px;font-weight:700;color:#d4a44a}
+
+/* Cards */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;width:100%;max-width:1100px;margin-top:30px}
+.stat-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:30px;text-align:center;transition:all 0.3s}
+.stat-card:hover{border-color:#d4a44a;transform:translateY(-4px)}
+.stat-card .number{font-size:42px;font-weight:900;color:#d4a44a;margin-bottom:8px}
+.stat-card .label{font-size:14px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px}
+
+/* Comparison */
+.compare{display:grid;grid-template-columns:1fr 60px 1fr;gap:0;width:100%;max-width:1000px;align-items:center;margin-top:20px}
+.compare-box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:35px}
+.compare-box.now{border-color:rgba(255,80,80,0.3)}
+.compare-box.future{border-color:rgba(212,164,74,0.5);background:rgba(212,164,74,0.05)}
+.compare-arrow{text-align:center;font-size:36px;color:#d4a44a}
+.compare-box h3{text-align:center;margin-bottom:20px}
+.compare-line{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:16px}
+.compare-line .val{font-weight:700}
+.compare-total{display:flex;justify-content:space-between;padding:15px 0 0;font-size:20px;font-weight:700;color:#d4a44a}
+
+/* Timeline */
+.timeline{width:100%;max-width:1000px;margin-top:20px}
+.timeline-item{display:grid;grid-template-columns:140px 40px 1fr;gap:20px;align-items:start;margin-bottom:20px}
+.timeline-period{text-align:right;font-weight:700;font-size:16px;color:#d4a44a;padding-top:4px}
+.timeline-dot{display:flex;flex-direction:column;align-items:center}
+.timeline-dot .dot{width:16px;height:16px;border-radius:50%;background:#d4a44a;border:3px solid #1a1a2e}
+.timeline-dot .line{width:2px;height:60px;background:rgba(212,164,74,0.3)}
+.timeline-content{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px}
+.timeline-content h4{font-size:17px;margin-bottom:6px;color:#fff}
+.timeline-content p{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.5}
+.timeline-target{display:inline-block;background:rgba(212,164,74,0.15);color:#d4a44a;padding:4px 12px;border-radius:6px;font-size:13px;font-weight:600;margin-top:8px}
+
+/* Terms */
+.terms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;width:100%;max-width:1000px;margin-top:25px}
+.term-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:30px;text-align:center}
+.term-card .icon{font-size:36px;margin-bottom:12px}
+.term-card h4{font-size:18px;margin-bottom:8px;color:#fff}
+.term-card p{font-size:14px;color:rgba(255,255,255,0.5)}
+.cta-button{display:inline-block;margin-top:35px;padding:18px 50px;background:linear-gradient(135deg,#d4a44a,#b8862e);color:#0a0a0f;font-size:20px;font-weight:700;border-radius:12px;text-decoration:none;transition:all 0.3s;border:none;cursor:pointer}
+.cta-button:hover{transform:scale(1.05);box-shadow:0 0 40px rgba(212,164,74,0.3)}
+
+/* Programs */
+.programs{display:grid;grid-template-columns:1fr 1fr;gap:30px;width:100%;max-width:1000px;margin-top:20px}
+.program-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:30px}
+.program-card h3{text-align:center}
+.program-card .audience{font-size:14px;color:rgba(255,255,255,0.5);text-align:center;margin-bottom:15px}
+.program-line{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:15px}
+.flag{font-size:28px;text-align:center;margin-bottom:10px}
+
+/* Responsive */
+@media(max-width:768px){
+.slide{padding:30px 20px}
+h1{font-size:32px}h2{font-size:26px}
+.stats-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+.stat-card .number{font-size:28px}
+.compare{grid-template-columns:1fr;gap:15px}
+.compare-arrow{transform:rotate(90deg)}
+.programs{grid-template-columns:1fr}
+.terms-grid{grid-template-columns:1fr}
+.timeline-item{grid-template-columns:100px 30px 1fr;gap:10px}
+}
+</style>
+</head>
+<body>
+
+<div class="logo-top">PRODUCER PITCH</div>
+<div class="slide-counter"><span id="current">1</span> / <span id="total">6</span></div>
+
+<!-- SLIDE 1: Title -->
+<div class="slide active" id="s1">
+<h1>Polina Manokhina</h1>
+<p class="subtitle">Cinematic AI Creator &bull; 68K Followers &bull; 573K Likes Top Reel</p>
+<h2 style="font-size:28px;text-align:center;margin-top:10px">Как превратить талант в <span class="gold">$1M+ бизнес</span><br>за 12 месяцев</h2>
+<p style="text-align:center;margin-top:20px;font-size:16px;color:rgba(255,255,255,0.4)">Предложение о стратегическом партнёрстве</p>
+<p style="text-align:center;margin-top:40px;font-size:14px;color:rgba(255,255,255,0.3)">Нажимайте &rarr; для навигации</p>
+</div>
+
+<!-- SLIDE 2: Current Numbers -->
+<div class="slide" id="s2">
+<h2>Твои текущие цифры — <span class="gold">ТОП 0.1%</span></h2>
+<div class="stats-grid">
+<div class="stat-card">
+<div class="number">68K</div>
+<div class="label">Подписчиков</div>
+</div>
+<div class="stat-card">
+<div class="number">573K</div>
+<div class="label">Лайков (топ рилс)</div>
+</div>
+<div class="stat-card">
+<div class="number">8.4%</div>
+<div class="label">Engagement Rate</div>
+</div>
+<div class="stat-card">
+<div class="number">151K</div>
+<div class="label">Лайков (2-й рилс)</div>
+</div>
+</div>
+<p style="text-align:center;margin-top:30px;font-size:20px">Контент уровня <span class="gold">топ-студий</span>. Вовлечённость выше 99% аккаунтов в нише.</p>
+<p style="text-align:center;margin-top:10px;font-size:18px;color:rgba(255,255,255,0.5)">Но монетизация использует только <span style="color:#ff5555;font-weight:700">~10%</span> потенциала.</p>
+</div>
+
+<!-- SLIDE 3: Current vs Proposed -->
+<div class="slide" id="s3">
+<h2>Сейчас vs. <span class="gold">С нашей системой</span></h2>
+<div class="compare">
+<div class="compare-box now">
+<h3 style="color:#ff5555">Сейчас</h3>
+<div class="compare-line"><span>Affiliate</span><span class="val">$2-3K/мес</span></div>
+<div class="compare-line"><span>Brand deals</span><span class="val">$3-5K/мес</span></div>
+<div class="compare-line"><span>Курсы</span><span class="val">$0</span></div>
+<div class="compare-line"><span>Подписка/клуб</span><span class="val">$0</span></div>
+<div class="compare-line"><span>Agency</span><span class="val">$0-3K/мес</span></div>
+<div class="compare-total"><span>ИТОГО</span><span style="color:#ff5555">$5-11K/мес</span></div>
+</div>
+<div class="compare-arrow">&rarr;</div>
+<div class="compare-box future">
+<h3>С системой</h3>
+<div class="compare-line"><span>Курс USA ($497)</span><span class="val">$25K/мес</span></div>
+<div class="compare-line"><span>Курс UA ($97-197)</span><span class="val">$8K/мес</span></div>
+<div class="compare-line"><span>AI Cinema Club</span><span class="val">$48K/мес</span></div>
+<div class="compare-line"><span>Agency + Brands</span><span class="val">$30K/мес</span></div>
+<div class="compare-line"><span>Affiliate + прочее</span><span class="val">$7K/мес</span></div>
+<div class="compare-total"><span>ИТОГО</span><span>$118K/мес</span></div>
+</div>
+</div>
+<p style="text-align:center;margin-top:20px;font-size:16px;color:rgba(255,255,255,0.5)">Разница — не контент (он уже идеален). Разница — <span class="gold">система</span>.</p>
+</div>
+
+<!-- SLIDE 4: Two Programs -->
+<div class="slide" id="s4">
+<h2>Две программы — <span class="gold">два рынка</span></h2>
+<div class="programs">
+<div class="program-card">
+<div class="flag">🇺🇸</div>
+<h3>AI Content Creator Academy</h3>
+<div class="audience">USA &bull; Средний класс 25-45 &bull; English</div>
+<div class="program-line"><span>Цена курса</span><span class="val gold">$497</span></div>
+<div class="program-line"><span>VIP-версия</span><span class="val gold">$997</span></div>
+<div class="program-line"><span>Клуб (подписка)</span><span class="val gold">$97/мес</span></div>
+<div class="program-line"><span>Целевая аудитория</span><span class="val">50M+ людей</span></div>
+<div class="program-line"><span>Конкуренция</span><span class="val">Низкая в cinematic AI</span></div>
+<div class="program-line"><span>Цель Year 1</span><span class="val gold">$800K+</span></div>
+</div>
+<div class="program-card">
+<div class="flag">🇺🇦</div>
+<h3>AI Контент Академія</h3>
+<div class="audience">Ukraine &bull; Молодёжь 16-25 + средний класс &bull; UA/RU</div>
+<div class="program-line"><span>Цена курса</span><span class="val gold">$97-197</span></div>
+<div class="program-line"><span>Teen-версия</span><span class="val gold">$47</span></div>
+<div class="program-line"><span>Клуб (подписка)</span><span class="val gold">$17/мес</span></div>
+<div class="program-line"><span>Целевая аудитория</span><span class="val">5M+ людей</span></div>
+<div class="program-line"><span>Конкуренция</span><span class="val">Почти нет</span></div>
+<div class="program-line"><span>Цель Year 1</span><span class="val gold">$200K+</span></div>
+</div>
+</div>
+<p style="text-align:center;margin-top:20px;font-size:16px;color:rgba(255,255,255,0.5)">Суммарный потенциал двух программ: <span class="gold" style="font-size:20px;font-weight:700">$1M-1.5M / год</span></p>
+</div>
+
+<!-- SLIDE 5: 90-Day Plan -->
+<div class="slide" id="s5">
+<h2>План на <span class="gold">90 дней</span></h2>
+<div class="timeline">
+<div class="timeline-item">
+<div class="timeline-period">Недели 1-2</div>
+<div class="timeline-dot"><div class="dot"></div><div class="line"></div></div>
+<div class="timeline-content">
+<h4>Создание продукта + воронки</h4>
+<p>Запись курса, лендинги, TG-бот, email-серии, ManyChat. Всё под ключ — наша команда делает.</p>
+<div class="timeline-target">Polina: только записать 6 модулей</div>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-period">Недели 3-4</div>
+<div class="timeline-dot"><div class="dot"></div><div class="line"></div></div>
+<div class="timeline-content">
+<h4>Beta-запуск + первый вебинар</h4>
+<p>50 мест по early bird цене. Первый вебинар. Сбор отзывов и кейсов.</p>
+<div class="timeline-target">Цель: $15-30K</div>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-period">Месяц 2</div>
+<div class="timeline-dot"><div class="dot"></div><div class="line"></div></div>
+<div class="timeline-content">
+<h4>Полный запуск + клуб</h4>
+<p>Основной запуск курса. Открытие AI Cinema Club ($97/мес). Запуск рекламы.</p>
+<div class="timeline-target">Цель: $50-80K</div>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-period">Месяц 3</div>
+<div class="timeline-dot"><div class="dot"></div><div class="line"></div></div>
+<div class="timeline-content">
+<h4>Масштабирование + UA рынок</h4>
+<p>Evergreen-воронка. Запуск UA программы. Agency-пакеты. Автоматизация.</p>
+<div class="timeline-target">Цель: $100-150K/мес</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 6: Terms + CTA -->
+<div class="slide" id="s6">
+<h2>Условия <span class="gold">партнёрства</span></h2>
+<div class="terms-grid">
+<div class="term-card">
+<div class="icon">💰</div>
+<h4>0$ Upfront</h4>
+<p>Ты не платишь ничего вперёд. Мы инвестируем свои ресурсы, команду и время.</p>
+</div>
+<div class="term-card">
+<div class="icon">📊</div>
+<h4>20-25% от новых продаж</h4>
+<p>Только от продуктов, которые мы вместе запустим. Твои текущие доходы — 100% твои.</p>
+</div>
+<div class="term-card">
+<div class="icon">🧪</div>
+<h4>Тест 30 дней</h4>
+<p>Запускаем один продукт. Смотрим цифры. Если не нравится — расходимся. Без обязательств.</p>
+</div>
+</div>
+<p style="text-align:center;margin-top:30px;font-size:20px">Что мы берём на себя: <span class="gold">воронки, лендинги, боты, реклама, копирайтинг, аналитика</span></p>
+<p style="text-align:center;margin-top:8px;font-size:20px">Что делаешь ты: <span class="gold">контент + экспертиза</span> (то, что ты уже делаешь)</p>
+<button class="cta-button" style="display:block;margin:35px auto 0">Готова начать? 🚀</button>
+</div>
+
+<!-- Navigation -->
+<div class="nav" id="nav"></div>
+<div class="arrows">
+<button onclick="changeSlide(-1)">&larr;</button>
+<button onclick="changeSlide(1)">&rarr;</button>
+</div>
+
+<script>
+const slides=document.querySelectorAll('.slide');
+const nav=document.getElementById('nav');
+const total=slides.length;
+let current=0;
+document.getElementById('total').textContent=total;
+
+// Create nav dots
+for(let i=0;i<total;i++){
+const dot=document.createElement('div');
+dot.className='nav-dot'+(i===0?' active':'');
+dot.onclick=()=>goTo(i);
+nav.appendChild(dot);
+}
+
+function goTo(n){
+if(n<0||n>=total)return;
+slides[current].className='slide'+(n>current?' prev':'');
+current=n;
+slides[current].className='slide active';
+document.getElementById('current').textContent=current+1;
+document.querySelectorAll('.nav-dot').forEach((d,i)=>d.className='nav-dot'+(i===current?' active':''));
+}
+
+function changeSlide(dir){goTo(current+dir)}
+
+document.addEventListener('keydown',e=>{
+if(e.key==='ArrowRight'||e.key===' ')changeSlide(1);
+if(e.key==='ArrowLeft')changeSlide(-1);
+});
+
+// Touch support
+let touchStartX=0;
+document.addEventListener('touchstart',e=>touchStartX=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{
+const diff=e.changedTouches[0].clientX-touchStartX;
+if(Math.abs(diff)>50){diff>0?changeSlide(-1):changeSlide(1)}
+});
+</script>
+</body>
+</html>
