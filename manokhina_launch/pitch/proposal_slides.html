@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Пропозиція — Polina Manokhina x Продюсер</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#e8e8e8;overflow:hidden;height:100vh;width:100vw}
+.slide{position:absolute;top:0;left:0;width:100vw;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 80px;opacity:0;transform:translateX(100px);transition:all .6s cubic-bezier(.4,0,.2,1);pointer-events:none}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:all}
+.slide.prev{opacity:0;transform:translateX(-100px)}
+.nav{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:100}
+.nav-dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:all .3s}
+.nav-dot.active{background:#d4a44a;transform:scale(1.3)}
+.slide-counter{position:fixed;top:30px;right:40px;font-size:14px;color:rgba(255,255,255,.4);z-index:100}
+.arrows{position:fixed;bottom:28px;right:40px;display:flex;gap:10px;z-index:100}
+.arrows button{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;width:40px;height:40px;border-radius:8px;cursor:pointer;font-size:18px;transition:all .2s}
+.arrows button:hover{background:rgba(212,164,74,.3);border-color:#d4a44a}
+.logo-top{position:fixed;top:30px;left:40px;font-size:14px;font-weight:600;color:#d4a44a;z-index:100;letter-spacing:1px}
+h1{font-size:48px;font-weight:900;line-height:1.1;margin-bottom:20px;background:linear-gradient(135deg,#fff,#d4a44a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:36px;font-weight:700;margin-bottom:25px;color:#fff}
+h3{font-size:22px;font-weight:600;color:#d4a44a;margin-bottom:12px}
+p{font-size:17px;line-height:1.6;color:rgba(255,255,255,.8)}
+.subtitle{font-size:20px;color:rgba(255,255,255,.5);margin-bottom:30px;font-weight:300}
+.gold{color:#d4a44a}
+.red{color:#ff5555}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;width:100%;max-width:1100px;margin-top:25px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:100%;max-width:1000px;margin-top:25px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:30px;width:100%;max-width:1000px;margin-top:20px}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:28px;text-align:center;transition:all .3s}
+.card:hover{border-color:#d4a44a;transform:translateY(-3px)}
+.card .num{font-size:40px;font-weight:900;color:#d4a44a;margin-bottom:6px}
+.card .lbl{font-size:13px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px}
+.card h4{font-size:17px;margin-bottom:8px;color:#fff}
+.card p{font-size:14px;color:rgba(255,255,255,.5)}
+.card .icon{font-size:32px;margin-bottom:10px}
+.compare{display:grid;grid-template-columns:1fr 50px 1fr;gap:0;width:100%;max-width:1000px;align-items:center;margin-top:20px}
+.cbox{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:30px}
+.cbox.now{border-color:rgba(255,80,80,.3)}
+.cbox.future{border-color:rgba(212,164,74,.5);background:rgba(212,164,74,.05)}
+.carrow{text-align:center;font-size:32px;color:#d4a44a}
+.cline{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:15px}
+.cline .v{font-weight:700}
+.ctotal{display:flex;justify-content:space-between;padding:12px 0 0;font-size:18px;font-weight:700;color:#d4a44a}
+.timeline{width:100%;max-width:1000px;margin-top:15px}
+.titem{display:grid;grid-template-columns:120px 30px 1fr;gap:15px;align-items:start;margin-bottom:16px}
+.tperiod{text-align:right;font-weight:700;font-size:15px;color:#d4a44a;padding-top:4px}
+.tdot{display:flex;flex-direction:column;align-items:center}
+.tdot .dot{width:14px;height:14px;border-radius:50%;background:#d4a44a;border:3px solid #1a1a2e}
+.tdot .line{width:2px;height:50px;background:rgba(212,164,74,.3)}
+.tcontent{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px}
+.tcontent h4{font-size:15px;margin-bottom:4px;color:#fff}
+.tcontent p{font-size:13px;color:rgba(255,255,255,.6)}
+.ttarget{display:inline-block;background:rgba(212,164,74,.15);color:#d4a44a;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;margin-top:6px}
+.cta-btn{display:inline-block;margin-top:30px;padding:16px 45px;background:linear-gradient(135deg,#d4a44a,#b8862e);color:#0a0a0f;font-size:18px;font-weight:700;border-radius:12px;border:none;cursor:pointer;transition:all .3s}
+.cta-btn:hover{transform:scale(1.05);box-shadow:0 0 40px rgba(212,164,74,.3)}
+.insight{background:rgba(212,164,74,.08);border-left:3px solid #d4a44a;padding:12px 18px;border-radius:0 8px 8px 0;margin-top:15px;font-size:14px;color:rgba(255,255,255,.7);max-width:900px}
+.roles-table{width:100%;max-width:1000px;margin-top:15px;border-collapse:collapse}
+.roles-table th{background:rgba(212,164,74,.15);color:#d4a44a;padding:10px 15px;text-align:left;font-size:14px}
+.roles-table td{padding:10px 15px;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px;color:rgba(255,255,255,.7)}
+.roles-table tr:hover td{background:rgba(255,255,255,.02)}
+@media(max-width:768px){
+.slide{padding:30px 20px}h1{font-size:30px}h2{font-size:24px}
+.grid4,.grid3{grid-template-columns:repeat(2,1fr);gap:10px}
+.grid2{grid-template-columns:1fr}
+.compare{grid-template-columns:1fr;gap:12px}.carrow{transform:rotate(90deg)}
+.titem{grid-template-columns:90px 25px 1fr;gap:8px}
+}
+</style>
+</head>
+<body>
+<div class="logo-top">PRODUCER PITCH</div>
+<div class="slide-counter"><span id="cur">1</span> / <span id="tot">8</span></div>
+
+<!-- SLIDE 1: Title -->
+<div class="slide active" id="s1">
+<h1>Polina Manokhina</h1>
+<p class="subtitle">Cinematic AI Creator &bull; 68K &bull; 573K likes top reel</p>
+<h2 style="font-size:26px;text-align:center;margin-top:10px">Як перетворити талант на <span class="gold">$1M+ бізнес</span><br>за 12 місяців</h2>
+<p style="text-align:center;margin-top:15px;font-size:15px;color:rgba(255,255,255,.4)">Пропозиція стратегічного партнерства</p>
+<div class="insight" style="margin-top:30px;text-align:center;border-left:none;border:1px solid rgba(212,164,74,.3);border-radius:8px">Методологія американських запусків &bull; $1.5M+ перевірений revenue &bull; ROAS до 9x</div>
+<p style="text-align:center;margin-top:30px;font-size:13px;color:rgba(255,255,255,.25)">Натискайте &rarr; для навігації</p>
+</div>
+
+<!-- SLIDE 2: Numbers -->
+<div class="slide" id="s2">
+<h2>Твої цифри — <span class="gold">ТОП 0.1%</span></h2>
+<div class="grid4">
+<div class="card"><div class="num">68K</div><div class="lbl">Підписників</div></div>
+<div class="card"><div class="num">573K</div><div class="lbl">Лайків (топ рілс)</div></div>
+<div class="card"><div class="num">8.4%</div><div class="lbl">Engagement Rate</div></div>
+<div class="card"><div class="num">151K</div><div class="lbl">Лайків (2-й рілс)</div></div>
+</div>
+<p style="text-align:center;margin-top:25px;font-size:18px">Контент рівня <span class="gold">топ-студій</span>. Залученість вище 99% акаунтів у ніші.</p>
+<p style="text-align:center;margin-top:8px;font-size:16px;color:rgba(255,255,255,.5)">Але монетизація використовує лише <span class="red" style="font-weight:700">~10%</span> потенціалу.</p>
+<div class="insight">Інсайт: US ринок = <b>9x більше revenue</b> при тих самих зусиллях. Аудиторія <b>37x більша</b>. Конкуренція в cinematic AI — нульова.</div>
+</div>
+
+<!-- SLIDE 3: Current vs Future -->
+<div class="slide" id="s3">
+<h2>Зараз vs. <span class="gold">З нашою системою</span></h2>
+<div class="compare">
+<div class="cbox now">
+<h3 style="color:#ff5555;text-align:center">Зараз</h3>
+<div class="cline"><span>Affiliate</span><span class="v">$2-3K/міс</span></div>
+<div class="cline"><span>Brand deals</span><span class="v">$3-5K/міс</span></div>
+<div class="cline"><span>Курси</span><span class="v">$0</span></div>
+<div class="cline"><span>Підписка/клуб</span><span class="v">$0</span></div>
+<div class="cline"><span>Agency</span><span class="v">$0-3K/міс</span></div>
+<div class="ctotal"><span>РАЗОМ</span><span style="color:#ff5555">$5-11K/міс</span></div>
+</div>
+<div class="carrow">&rarr;</div>
+<div class="cbox future">
+<h3 style="text-align:center">З системою</h3>
+<div class="cline"><span>Курс USA ($497)</span><span class="v">$25K/міс</span></div>
+<div class="cline"><span>VIP ($997-2,497)</span><span class="v">$40K/міс</span></div>
+<div class="cline"><span>Курс UA ($97-197)</span><span class="v">$8K/міс</span></div>
+<div class="cline"><span>AI Cinema Club</span><span class="v">$48K/міс</span></div>
+<div class="cline"><span>Agency + Brands</span><span class="v">$30K/міс</span></div>
+<div class="ctotal"><span>РАЗОМ</span><span>$151K/міс</span></div>
+</div>
+</div>
+<div class="insight">Інсайт Жанни: <b>VIP-тариф = 40% виручки</b> всього запуску. Один VIP за $2,497 приносить більше, ніж 5 базових продажів.</div>
+</div>
+
+<!-- SLIDE 4: Methodology -->
+<div class="slide" id="s4">
+<h2>Методологія <span class="gold">американських запусків</span></h2>
+<div class="grid3">
+<div class="card"><div class="icon">1</div><h4>6 етапів прогріву</h4><p>Обізнаність &rarr; Знайомство &rarr; Ідея &rarr; Продукт &rarr; Заперечення &rarr; Ажіотаж</p></div>
+<div class="card"><div class="icon">2</div><h4>3 канали конверсії</h4><p>Email (7-14 листів) + WhatsApp (98% open rate) + YouTube (5x конверсія)</p></div>
+<div class="card"><div class="icon">3</div><h4>4 вебінари</h4><p>Тестовий &rarr; VIP &rarr; Основний &rarr; Дотискний. Конверсія 10%+</p></div>
+</div>
+<div class="grid3" style="margin-top:20px">
+<div class="card"><div class="icon">4</div><h4>Автоворонка</h4><p>Реклама &rarr; Лендінг &rarr; Лід-магніт &rarr; Email &rarr; Вебінар &rarr; Продаж</p></div>
+<div class="card"><div class="icon">5</div><h4>Payment Plan</h4><p>Обов'язковий. Збільшує конверсію на 30-40%. Money-back гарантія.</p></div>
+<div class="card"><div class="icon">6</div><h4>Докази > Емоції</h4><p>US ринок цінує факти: цифри, кейси, ROI. ROAS ціль: 3-5x (досягали 9x)</p></div>
+</div>
+</div>
+
+<!-- SLIDE 5: 90-Day Plan -->
+<div class="slide" id="s5">
+<h2>План на <span class="gold">90 днів</span></h2>
+<div class="timeline">
+<div class="titem">
+<div class="tperiod">Тижні 1-4</div>
+<div class="tdot"><div class="dot"></div><div class="line"></div></div>
+<div class="tcontent"><h4>Фундамент: продукт + воронка</h4><p>Запис курсу, лендінги, ManyChat, email-серії, TG-бот. Прогрів за 6 етапами.</p><div class="ttarget">Polina: записати 6 модулів</div></div>
+</div>
+<div class="titem">
+<div class="tperiod">Тижні 5-8</div>
+<div class="tdot"><div class="dot"></div><div class="line"></div></div>
+<div class="tcontent"><h4>Soft Launch: тестовий вебінар + VIP</h4><p>50 місць early bird. Email 7-14 листів. WhatsApp (98% open). YouTube контент.</p><div class="ttarget">Ціль: $15-30K</div></div>
+</div>
+<div class="titem">
+<div class="tperiod">Тижні 9-10</div>
+<div class="tdot"><div class="dot"></div><div class="line"></div></div>
+<div class="tcontent"><h4>Повний запуск: основний + дотискний вебінар</h4><p>VIP-продаж (40% виручки!). Evergreen-воронка. AI Cinema Club $97/міс.</p><div class="ttarget">Ціль: $50-80K</div></div>
+</div>
+<div class="titem">
+<div class="tperiod">Тижні 11-12</div>
+<div class="tdot"><div class="dot"></div><div class="line"></div></div>
+<div class="tcontent"><h4>Масштабування + UA ринок</h4><p>Автоворонка працює. Запуск UA програми. Реклама $3-5K/міс. Agency-пакети.</p><div class="ttarget">Ціль: $100-150K/міс</div></div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 6: Team & Roles -->
+<div class="slide" id="s6">
+<h2>Розподіл <span class="gold">ролей</span></h2>
+<div class="grid2">
+<div class="cbox future" style="border-color:rgba(212,164,74,.3)">
+<h3 style="text-align:center">Polina (ЕКСПЕРТ)</h3>
+<div class="cline"><span>Запис курсу</span><span class="v">6 модулів</span></div>
+<div class="cline"><span>Вебінари</span><span class="v">1-2x/міс</span></div>
+<div class="cline"><span>Контент</span><span class="v">3-5 рілсів/тиж</span></div>
+<div class="cline"><span>Stories</span><span class="v">3-5/день</span></div>
+<div class="cline"><span>VIP-чат</span><span class="v">15-20 хв/день</span></div>
+<div class="ctotal"><span>Додатково</span><span>~5-8 год/тиж</span></div>
+</div>
+<div class="cbox" style="border-color:rgba(212,164,74,.5);background:rgba(212,164,74,.03)">
+<h3 style="text-align:center">Продюсер + КОМАНДА</h3>
+<div class="cline"><span>Стратегія запуску</span><span class="v">100%</span></div>
+<div class="cline"><span>Воронки + копірайтинг</span><span class="v">100%</span></div>
+<div class="cline"><span>Реклама + таргетинг</span><span class="v">100%</span></div>
+<div class="cline"><span>Технічна частина</span><span class="v">100%</span></div>
+<div class="cline"><span>Аналітика + P&L</span><span class="v">100%</span></div>
+<div class="ctotal"><span>Команда</span><span>5 спеціалістів</span></div>
+</div>
+</div>
+<div class="insight">Команда за методологією Жанни: <b>контент-менеджер, таргетолог, техспеціаліст, sales-менеджер, фіндиректор</b></div>
+</div>
+
+<!-- SLIDE 7: Financial -->
+<div class="slide" id="s7">
+<h2>Фінансовий <span class="gold">прогноз</span></h2>
+<div class="grid3">
+<div class="card" style="border-color:rgba(255,255,255,.15)"><h4 style="color:rgba(255,255,255,.5)">Песимістичний</h4><div class="num" style="font-size:32px;color:rgba(255,255,255,.5)">$630K</div><div class="lbl">50% від плану</div></div>
+<div class="card" style="border-color:rgba(212,164,74,.5);background:rgba(212,164,74,.05)"><h4>Базовий</h4><div class="num">$1.26M</div><div class="lbl">Рік 1</div></div>
+<div class="card" style="border-color:rgba(212,164,74,.3)"><h4>Оптимістичний</h4><div class="num" style="font-size:32px">$1.89M</div><div class="lbl">150% від плану</div></div>
+</div>
+<div class="grid2" style="margin-top:20px">
+<div class="card" style="text-align:left"><h4>Unit Economics (USA)</h4><p>CAC: $15-25/lead<br>Конверсія: 8-12%<br>AOV: $497<br>LTV: $1,200-2,500<br><b style="color:#d4a44a">LTV:CAC = 6-10x</b></p></div>
+<div class="card" style="text-align:left"><h4>Доля Polina</h4><p>Gross: $1,260,000<br>Витрати (~22%): -$277K<br>Net: $983K<br>Доля продюсера (22.5%): $221K<br><b style="color:#d4a44a">Доля Polina (77.5%): $762K</b></p></div>
+</div>
+</div>
+
+<!-- SLIDE 8: Terms + CTA -->
+<div class="slide" id="s8">
+<h2>Умови <span class="gold">партнерства</span></h2>
+<div class="grid3">
+<div class="card"><div class="icon" style="font-size:40px">$0</div><h4>Upfront = нуль</h4><p>Ти не платиш нічого наперед. Ми інвестуємо свої ресурси, команду і час.</p></div>
+<div class="card"><div class="icon" style="font-size:28px">20-25%</div><h4>Від нових продажів</h4><p>Тільки від продуктів, які ми разом запустимо. Твої поточні доходи — 100% твої.</p></div>
+<div class="card"><div class="icon" style="font-size:28px">30 днів</div><h4>Тестовий період</h4><p>Запускаємо один продукт. Дивимось цифри. Не подобається — розходимось без зобов'язань.</p></div>
+</div>
+<p style="text-align:center;margin-top:25px;font-size:18px">Ми беремо на себе: <span class="gold">воронки, лендінги, боти, реклама, копірайтинг, аналітика</span></p>
+<p style="text-align:center;margin-top:6px;font-size:18px">Ти робиш: <span class="gold">контент + експертиза</span> (те, що вже робиш)</p>
+<button class="cta-btn" style="display:block;margin:25px auto 0">Готова почати?</button>
+<p style="text-align:center;margin-top:15px;font-size:13px;color:rgba(255,255,255,.3)">Давай знайдемо 30 хвилин на дзвінок</p>
+</div>
+
+<div class="nav" id="nav"></div>
+<div class="arrows">
+<button onclick="go(-1)">&larr;</button>
+<button onclick="go(1)">&rarr;</button>
+</div>
+
+<script>
+const S=document.querySelectorAll('.slide'),N=document.getElementById('nav'),T=S.length;let C=0;
+document.getElementById('tot').textContent=T;
+for(let i=0;i<T;i++){const d=document.createElement('div');d.className='nav-dot'+(i===0?' active':'');d.onclick=()=>jump(i);N.appendChild(d)}
+function jump(n){if(n<0||n>=T)return;S[C].className='slide'+(n>C?' prev':'');C=n;S[C].className='slide active';document.getElementById('cur').textContent=C+1;document.querySelectorAll('.nav-dot').forEach((d,i)=>d.className='nav-dot'+(i===C?' active':''))}
+function go(d){jump(C+d)}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')go(1);if(e.key==='ArrowLeft')go(-1)});
+let tx=0;document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50){d>0?go(-1):go(1)}});
+</script>
+</body>
+</html>
