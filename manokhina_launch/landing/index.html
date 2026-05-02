@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Cinema Academy — Створюй кінематографічний AI-контент</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#C9A84C;--gold-light:#E8D5A0;--gold-dark:#A8893A;--white:#FFFFFF;--cream:#FBF8F0;--dark:#1A1A1A;--gray:#6B6B6B;--light-gray:#F5F3EE}
+body{font-family:'Inter',sans-serif;color:var(--dark);background:var(--white);line-height:1.7}
+h1,h2,h3,h4{font-family:'Playfair Display',serif;font-weight:600}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+/* HERO */
+.hero{background:linear-gradient(135deg,#1A1A1A 0%,#2D2520 50%,#1A1A1A 100%);color:var(--white);padding:80px 0 60px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,0.15) 0%,transparent 70%)}
+.hero-photo{width:180px;height:180px;border-radius:50%;border:3px solid var(--gold);object-fit:cover;margin:0 auto 30px;display:block;background:#333}
+.hero h1{font-size:clamp(28px,5vw,48px);margin-bottom:16px;line-height:1.2}
+.hero h1 span{color:var(--gold)}
+.hero p.sub{font-size:18px;color:#bbb;max-width:650px;margin:0 auto 30px;font-weight:300}
+.hero-stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;margin-top:30px}
+.hero-stat{text-align:center}
+.hero-stat .num{font-family:'Playfair Display',serif;font-size:32px;color:var(--gold);font-weight:700}
+.hero-stat .label{font-size:13px;color:#999;margin-top:4px}
+/* PAIN */
+.pain{background:var(--cream);padding:70px 0}
+.pain h2{text-align:center;font-size:clamp(24px,4vw,36px);margin-bottom:12px}
+.pain h2 span{color:var(--gold-dark)}
+.pain .intro{text-align:center;color:var(--gray);max-width:600px;margin:0 auto 40px;font-size:15px}
+.pain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
+.pain-card{background:var(--white);border-radius:16px;padding:28px;border-left:4px solid var(--gold);box-shadow:0 2px 20px rgba(0,0,0,0.04)}
+.pain-card .emoji{font-size:28px;margin-bottom:12px}
+.pain-card h4{font-size:17px;margin-bottom:8px;color:var(--dark)}
+.pain-card p{font-size:14px;color:var(--gray);line-height:1.6}
+.pain-card .quote{font-style:italic;color:var(--dark);margin-top:10px;font-size:13px;border-left:2px solid var(--gold-light);padding-left:12px}
+/* TRANSFORM */
+.transform{padding:70px 0;background:var(--white)}
+.transform h2{text-align:center;font-size:clamp(24px,4vw,36px);margin-bottom:40px}
+.transform h2 span{color:var(--gold-dark)}
+.transform-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px}
+.transform-item{text-align:center;padding:30px 20px}
+.transform-item .icon{font-size:40px;margin-bottom:16px}
+.transform-item h4{font-size:18px;margin-bottom:10px}
+.transform-item p{font-size:14px;color:var(--gray)}
+/* EXPERT */
+.expert{background:linear-gradient(135deg,#1A1A1A,#2D2520);color:var(--white);padding:70px 0}
+.expert-inner{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+.expert-photo{width:100%;max-width:400px;border-radius:16px;border:2px solid var(--gold);object-fit:cover;aspect-ratio:3/4;background:#333}
+.expert-text h2{font-size:clamp(24px,4vw,36px);margin-bottom:20px}
+.expert-text h2 span{color:var(--gold)}
+.expert-text p{color:#ccc;font-size:15px;margin-bottom:14px;line-height:1.7}
+.expert-text .highlight{color:var(--gold);font-weight:500}
+.expert-achievements{display:flex;gap:24px;margin-top:24px;flex-wrap:wrap}
+.expert-achievements div{text-align:center}
+.expert-achievements .num{font-family:'Playfair Display',serif;font-size:28px;color:var(--gold);font-weight:700;display:block}
+.expert-achievements .label{font-size:12px;color:#999}
+/* PRODUCTS */
+.products{padding:70px 0;background:var(--cream)}
+.products h2{text-align:center;font-size:clamp(24px,4vw,36px);margin-bottom:12px}
+.products h2 span{color:var(--gold-dark)}
+.products .intro{text-align:center;color:var(--gray);max-width:600px;margin:0 auto 40px}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:24px}
+.product-card{background:var(--white);border-radius:20px;padding:32px 28px;position:relative;box-shadow:0 4px 30px rgba(0,0,0,0.06);transition:transform .3s}
+.product-card:hover{transform:translateY(-4px)}
+.product-card.featured{border:2px solid var(--gold);box-shadow:0 8px 40px rgba(201,168,76,0.2)}
+.product-card.featured::before{content:'НАЙПОПУЛЯРНІШИЙ';position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--white);font-size:11px;font-weight:600;padding:4px 16px;border-radius:20px;letter-spacing:1px}
+.product-card h3{font-size:22px;margin-bottom:6px}
+.product-card .desc{font-size:13px;color:var(--gray);margin-bottom:20px}
+.product-card .price{font-family:'Playfair Display',serif;font-size:36px;color:var(--gold-dark);font-weight:700;margin-bottom:4px}
+.product-card .price-old{font-size:16px;color:#bbb;text-decoration:line-through;margin-bottom:16px;display:block}
+.product-card ul{list-style:none;margin-bottom:24px}
+.product-card ul li{font-size:14px;padding:6px 0;border-bottom:1px solid var(--light-gray);position:relative;padding-left:24px}
+.product-card ul li::before{content:'✓';position:absolute;left:0;color:var(--gold);font-weight:700}
+.btn{display:inline-block;padding:14px 32px;border-radius:50px;font-size:15px;font-weight:600;text-decoration:none;text-align:center;cursor:pointer;transition:all .3s}
+.btn-gold{background:var(--gold);color:var(--white);width:100%}
+.btn-gold:hover{background:var(--gold-dark)}
+.btn-outline{border:2px solid var(--gold);color:var(--gold);width:100%}
+.btn-outline:hover{background:var(--gold);color:var(--white)}
+/* VALUE STACK */
+.value{padding:60px 0;background:var(--white)}
+.value h2{text-align:center;font-size:clamp(22px,3.5vw,32px);margin-bottom:30px}
+.value h2 span{color:var(--gold-dark)}
+.value-table{max-width:600px;margin:0 auto}
+.value-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eee;font-size:15px}
+.value-row .item{color:var(--dark)}
+.value-row .val{font-weight:600;color:var(--gold-dark)}
+.value-total{display:flex;justify-content:space-between;padding:16px 0;font-size:20px;font-weight:700;border-top:2px solid var(--gold)}
+.value-total .val{color:var(--gold-dark);font-family:'Playfair Display',serif;font-size:24px}
+.value-pay{text-align:center;margin-top:24px;font-size:22px}
+.value-pay span{font-family:'Playfair Display',serif;font-size:40px;color:var(--gold-dark);font-weight:700}
+/* BONUSES */
+.bonuses{padding:60px 0;background:var(--cream)}
+.bonuses h2{text-align:center;font-size:clamp(22px,3.5vw,32px);margin-bottom:30px}
+.bonuses h2 span{color:var(--gold-dark)}
+.bonus-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:900px;margin:0 auto}
+.bonus-card{background:var(--white);border-radius:14px;padding:24px;text-align:center;border:1px solid var(--gold-light)}
+.bonus-card .emoji{font-size:32px;margin-bottom:10px}
+.bonus-card h4{font-size:16px;margin-bottom:6px}
+.bonus-card p{font-size:13px;color:var(--gray)}
+.bonus-card .val{color:var(--gold-dark);font-weight:600;font-size:14px;margin-top:8px}
+/* GUARANTEE */
+.guarantee{padding:60px 0;background:var(--white);text-align:center}
+.guarantee h2{font-size:clamp(22px,3.5vw,30px);margin-bottom:16px}
+.guarantee p{max-width:600px;margin:0 auto;color:var(--gray);font-size:15px;line-height:1.7}
+.guarantee .badge{display:inline-block;margin-top:20px;padding:12px 28px;border:2px solid var(--gold);border-radius:50px;color:var(--gold-dark);font-weight:600;font-size:15px}
+/* FAQ */
+.faq{padding:60px 0;background:var(--cream)}
+.faq h2{text-align:center;font-size:clamp(22px,3.5vw,32px);margin-bottom:30px}
+.faq-list{max-width:700px;margin:0 auto}
+.faq-item{background:var(--white);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.faq-q{padding:18px 24px;font-weight:600;font-size:15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.faq-q::after{content:'+';font-size:20px;color:var(--gold)}
+.faq-a{padding:0 24px 18px;font-size:14px;color:var(--gray);display:none}
+.faq-item.open .faq-a{display:block}
+.faq-item.open .faq-q::after{content:'−'}
+/* FINAL CTA */
+.final{background:linear-gradient(135deg,#1A1A1A,#2D2520);color:var(--white);padding:70px 0;text-align:center}
+.final h2{font-size:clamp(24px,4vw,38px);margin-bottom:16px}
+.final h2 span{color:var(--gold)}
+.final p{color:#bbb;max-width:550px;margin:0 auto 30px;font-size:15px}
+.final .btn-gold{width:auto;padding:16px 48px;font-size:17px}
+.final .urgency{margin-top:20px;color:var(--gold);font-size:14px}
+/* PHOTO SECTION */
+.photos{padding:50px 0;background:var(--white)}
+.photos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:900px;margin:0 auto}
+.photos-grid img{width:100%;border-radius:12px;aspect-ratio:3/4;object-fit:cover;border:2px solid var(--gold-light);background:#eee}
+/* FOOTER */
+footer{background:var(--dark);color:#777;text-align:center;padding:30px;font-size:13px}
+/* RESPONSIVE */
+@media(max-width:768px){
+.expert-inner{grid-template-columns:1fr;text-align:center}
+.expert-photo{margin:0 auto}
+.hero-stats{gap:20px}
+.photos-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+<div class="container">
+<img class="hero-photo" src="https://instagram.com/p/DXOHHzeCI0j/media/?size=l" alt="AI Creator" onerror="this.style.background='linear-gradient(135deg,#C9A84C,#A8893A)'">
+<h1>Навчись створювати <span>кінематографічний AI-контент</span> що збирає сотні тисяч лайків</h1>
+<p class="sub">Покроковий курс від AI-креатора з Лос-Анджелеса. Від нуля до вірусних рілсів за 30 днів.</p>
+<div class="hero-stats">
+<div class="hero-stat"><div class="num">68K+</div><div class="label">підписників</div></div>
+<div class="hero-stat"><div class="num">573K</div><div class="label">лайків на топ-рілс</div></div>
+<div class="hero-stat"><div class="num">TOP 0.1%</div><div class="label">ER ніші</div></div>
+</div>
+</div>
+</section>
+
+<!-- PAIN POINTS (DNA Part 2) -->
+<section class="pain">
+<div class="container">
+<h2>Тобі <span>знайомі</span> ці думки?</h2>
+<p class="intro">Якщо хоча б одна — цей курс створений для тебе</p>
+<div class="pain-grid">
+<div class="pain-card">
+<div class="emoji">😩</div>
+<h4>«Я дивлюсь на ці AI-рілси і не розумію, як вони це роблять»</h4>
+<p>Ти бачиш неймовірний AI-контент в стрічці, але коли пробуєш сама — виходить щось середнє, без "магії". Ти не розумієш, чому в тебе не виходить ТАК.</p>
+<div class="quote">«Я вже перепробувала 10 туторіалів на YouTube, але результат все одно виглядає аматорським...»</div>
+</div>
+<div class="pain-card">
+<div class="emoji">⏰</div>
+<h4>«AI змінюється так швидко — я не встигаю і відстаю»</h4>
+<p>Кожен тиждень нові інструменти, нові можливості. Ти відчуваєш, що вікно закривається, а ти ще навіть не почала по-справжньому.</p>
+<div class="quote">«Поки я розбираюсь з Midjourney, всі вже на Kling і Runway. Я завжди на крок позаду...»</div>
+</div>
+<div class="pain-card">
+<div class="emoji">💸</div>
+<h4>«Я витрачаю гроші на підписки, але не заробляю на AI»</h4>
+<p>$10–60/міс на інструменти, а результат — пости які набирають 50 лайків. Ти відчуваєш, що інвестуєш в порожнечу.</p>
+<div class="quote">«Вже рік плачу за Midjourney. Подруга каже: "Може, краще на манікюр?" І мені нема що відповісти...»</div>
+</div>
+<div class="pain-card">
+<div class="emoji">🫣</div>
+<h4>«Я хочу монетизувати AI-скіли, але не знаю як»</h4>
+<p>Ти бачиш, як інші заробляють $2–10K за один рілс для бренду. А ти навіть не знаєш, з чого почати і скільки просити.</p>
+<div class="quote">«Я вмію генерувати круті картинки, але як перетворити це на дохід — взагалі не розумію...»</div>
+</div>
+<div class="pain-card">
+<div class="emoji">😔</div>
+<h4>«Мій контент гарний, але він не збирає охвати»</h4>
+<p>Ти витрачаєш години, створюєш красиві речі — але алгоритм їх не показує. Немає системи, немає стратегії, немає зростання.</p>
+<div class="quote">«Я виклала рілс, в який вклала душу. 200 переглядів. Хочеться все кинути...»</div>
+</div>
+<div class="pain-card">
+<div class="emoji">🤯</div>
+<h4>«Інформації занадто багато — я не знаю, з чого почати»</h4>
+<p>Сотні блогерів, кожен радить інше. Ти тонеш в інформаційному шумі і паралізована вибором.</p>
+<div class="quote">«Я зберігаю сотні постів "на потім", але ніколи до них не повертаюсь. Просто колекціоную хаос...»</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- TRANSFORMATION (DNA Part 4) -->
+<section class="transform">
+<div class="container">
+<h2>А тепер уяви, що <span>через 30 днів</span></h2>
+<div class="transform-grid">
+<div class="transform-item">
+<div class="icon">🎬</div>
+<h4>Ти створюєш кінематографічні рілси, від яких у людей щелепа відвисає</h4>
+<p>Ти знаєш точний workflow: ідея → промпт → генерація → монтаж → публікація. Кожен рілс — як трейлер до фільму.</p>
+</div>
+<div class="transform-item">
+<div class="icon">📈</div>
+<h4>Твої рілси набирають десятки тисяч переглядів</h4>
+<p>Ти розумієш алгоритм, знаєш формулу вірусності, і кожен твій пост працює на тебе 24/7.</p>
+</div>
+<div class="transform-item">
+<div class="icon">💰</div>
+<h4>Бренди самі пишуть тобі з пропозиціями</h4>
+<p>Ти маєш портфоліо, знаєш свою ціну ($2–10K за рілс), і клієнти приходять через контент.</p>
+</div>
+<div class="transform-item">
+<div class="icon">🧠</div>
+<h4>Ти на крок попереду всіх у AI-контенті</h4>
+<p>Ти знаєш всі актуальні інструменти, техніки і тренди. Люди приходять до ТЕБЕ за порадою.</p>
+</div>
+<div class="transform-item">
+<div class="icon">⚡</div>
+<h4>5 рілсів за 1 день замість 1 рілсу за тиждень</h4>
+<p>Batch-production, шаблони, workflow — ти працюєш як студія, а не як аматор.</p>
+</div>
+<div class="transform-item">
+<div class="icon">🌍</div>
+<h4>Ти працюєш з будь-якої точки світу</h4>
+<p>Ноутбук, AI-інструменти і твоя креативність — це все, що потрібно. Ні офісу, ні начальника, ні меж.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- EXPERT -->
+<section class="expert">
+<div class="container">
+<div class="expert-inner">
+<img class="expert-photo" src="https://instagram.com/p/DQdWYf0kbIJ/media/?size=l" alt="AI Creator" onerror="this.style.background='linear-gradient(135deg,#C9A84C,#333)'">
+<div class="expert-text">
+<h2>Хто буде <span>навчати</span></h2>
+<p>AI Creator з Лос-Анджелеса. Створює кінематографічний AI-контент, який збирає <span class="highlight">сотні тисяч лайків</span>.</p>
+<p>Рілс "Avatar BTS" — <span class="highlight">573,000 лайків</span>. Рілс "Titanic BTS" — <span class="highlight">151,000 лайків</span>. Кожен пост — як кадр з голлівудського фільму.</p>
+<p>Працює з брендами, створюючи AI-контент рівня, якого раніше не існувало. Поєднує технології з мистецтвом кінематографії.</p>
+<p><em>"Through my work, I explore how technology transforms creativity. My goal is to inspire, teach, and help brands and people unlock the magic of artificial intelligence."</em></p>
+<div class="expert-achievements">
+<div><span class="num">68K+</span><span class="label">підписників</span></div>
+<div><span class="num">573K</span><span class="label">топ-рілс лайків</span></div>
+<div><span class="num">TOP 0.1%</span><span class="label">engagement rate</span></div>
+<div><span class="num">LA</span><span class="label">Los Angeles, USA</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 3 PRODUCTS -->
+<section class="products" id="products">
+<div class="container">
+<h2>Обери свій <span>рівень</span></h2>
+<p class="intro">3 формати навчання — від швидкого старту до повного менторства</p>
+<div class="products-grid">
+
+<!-- Product 1: Starter -->
+<div class="product-card">
+<h3>AI Cinema Starter</h3>
+<p class="desc">Швидкий старт у AI-контент за 1 вечір</p>
+<div class="price">$67</div>
+<span class="price-old">$197</span>
+<ul>
+<li>Запис майстер-класу (90 хв) — повний workflow від ідеї до готового рілсу</li>
+<li>50 перевірених промптів для Midjourney + Kling</li>
+<li>Notion-шаблон повного workflow</li>
+<li>Чек-лист "10 пунктів перед публікацією"</li>
+<li>Доступ до закритого чату (30 днів)</li>
+</ul>
+<a href="#" class="btn btn-outline">Обрати Starter</a>
+</div>
+
+<!-- Product 2: Academy (Featured) -->
+<div class="product-card featured">
+<h3>AI Cinema Academy</h3>
+<p class="desc">Повний курс: від нуля до вірусного рілсу за 30 днів</p>
+<div class="price">$247</div>
+<span class="price-old">$697</span>
+<ul>
+<li>6 модулів відео-курсу з покроковими інструкціями</li>
+<li>Модуль 1: AI Foundations — налаштування MJ, Kling, Lovart</li>
+<li>Модуль 2: Cinematic Storytelling — композиція, світло, колір</li>
+<li>Модуль 3: Video Workflow — Image-to-Video pipeline</li>
+<li>Модуль 4: Advanced Techniques — multi-scene, batch-production</li>
+<li>Модуль 5: Monetization — як продавати AI-контент брендам</li>
+<li>Модуль 6: Viral Growth — алгоритм Instagram 2026</li>
+<li>100+ промптів (Midjourney, Kling, Runway, Lovart)</li>
+<li>Закрита спільнота на 6 місяців</li>
+<li>2 групових Q&A з ментором (Zoom)</li>
+<li>Notion-система повного workflow</li>
+<li>Оновлення курсу при виході нових AI-інструментів</li>
+</ul>
+<a href="#" class="btn btn-gold">Обрати Academy</a>
+</div>
+
+<!-- Product 3: VIP -->
+<div class="product-card">
+<h3>AI Cinema VIP</h3>
+<p class="desc">Персональний менторинг + побудова портфоліо</p>
+<div class="price">$497</div>
+<span class="price-old">$1,497</span>
+<ul>
+<li>Все з пакету Academy</li>
+<li>3 персональних розбори твоїх робіт від ментора</li>
+<li>Індивідуальна стратегія розвитку акаунту</li>
+<li>Портфоліо-сесія: створюємо 5 робіт для клієнтів</li>
+<li>Шаблони контрактів і комерційних пропозицій</li>
+<li>Закритий VIP-чат з щоденною підтримкою</li>
+<li>Сертифікат "Certified Cinematic AI Creator"</li>
+<li>Доступ до курсу назавжди + всі оновлення</li>
+</ul>
+<a href="#" class="btn btn-outline">Обрати VIP</a>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- VALUE STACK (Hormozi) -->
+<section class="value">
+<div class="container">
+<h2>Що ти <span>реально отримуєш</span></h2>
+<div class="value-table">
+<div class="value-row"><span class="item">6 модулів курсу (= 1:1 менторинг)</span><span class="val">$3,000</span></div>
+<div class="value-row"><span class="item">100+ промптів (по $3.7 кожен)</span><span class="val">$370</span></div>
+<div class="value-row"><span class="item">Закрита спільнота 6 місяців ($97 × 6)</span><span class="val">$582</span></div>
+<div class="value-row"><span class="item">2 групових Q&A сесії</span><span class="val">$500</span></div>
+<div class="value-row"><span class="item">Notion-шаблони і workflow</span><span class="val">$200</span></div>
+<div class="value-row"><span class="item">Модуль монетизації (скрипти + ціноутворення)</span><span class="val">$497</span></div>
+<div class="value-total"><span class="item">Загальна цінність:</span><span class="val">$5,149</span></div>
+</div>
+<div class="value-pay">Ти платиш: <span>$247</span></div>
+</div>
+</section>
+
+<!-- BONUSES -->
+<section class="bonuses">
+<div class="container">
+<h2>Бонуси <span>безкоштовно</span></h2>
+<div class="bonus-grid">
+<div class="bonus-card">
+<div class="emoji">🎁</div>
+<h4>Prompt Vault: 50 секретних промптів</h4>
+<p>Промпти, які використовуються для створення рілсів з 500K+ лайків</p>
+<div class="val">Цінність: $197</div>
+</div>
+<div class="bonus-card">
+<div class="emoji">🎥</div>
+<h4>BTS Blueprint: як знімати "Behind The Scenes"</h4>
+<p>Покрокова інструкція по створенню BTS-контенту, який збирає вірусні охвати</p>
+<div class="val">Цінність: $147</div>
+</div>
+<div class="bonus-card">
+<div class="emoji">📋</div>
+<h4>Brand Deal Kit: шаблони для роботи з брендами</h4>
+<p>Готові шаблони пропозицій, контрактів і прайсів для AI-послуг</p>
+<div class="val">Цінність: $297</div>
+</div>
+<div class="bonus-card">
+<div class="emoji">🔄</div>
+<h4>Довічні оновлення курсу</h4>
+<p>Кожен новий AI-інструмент — нові уроки додаються автоматично</p>
+<div class="val">Безцінно</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- GUARANTEE -->
+<section class="guarantee">
+<div class="container">
+<h2>14-денна гарантія повернення</h2>
+<p>Якщо протягом 14 днів ти зрозумієш, що курс не для тебе — ми повернемо 100% оплати без жодних питань. Ніякого ризику. Ти або отримуєш результат, або отримуєш гроші назад.</p>
+<div class="badge">🛡️ 100% Money-Back Guarantee</div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+<div class="container">
+<h2>Часті питання</h2>
+<div class="faq-list">
+<div class="faq-item open">
+<div class="faq-q">Я повний новачок в AI — мені підійде?</div>
+<div class="faq-a">Так! Курс починається з нуля. Модуль 1 — це повне налаштування всіх інструментів. Не потрібен досвід в дизайні, відео чи програмуванні.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">Скільки часу потрібно на проходження?</div>
+<div class="faq-a">Курс розрахований на 30 днів по 1-2 години/день. Але ти маєш доступ назавжди і можеш проходити у своєму темпі.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">Які інструменти потрібні?</div>
+<div class="faq-a">Midjourney ($10/міс), Kling (є безкоштовний план), CapCut (безкоштовно). Загалом $10-30/міс — менше ніж одна вечеря в ресторані.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">Чи можна платити частинами?</div>
+<div class="faq-a">Так! Для пакетів Academy і VIP доступна розстрочка на 3 платежі.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">Чи реально заробляти на AI-контенті?</div>
+<div class="faq-a">Один якісний AI-рілс для бренду коштує $2,000-5,000. Після курсу ти зможеш створювати такий контент. Модуль 5 повністю присвячений монетизації.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">Є гарантія повернення?</div>
+<div class="faq-a">14 днів — без питань. Якщо курс не підійде, повернемо 100% оплати.</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final">
+<div class="container">
+<h2>Готова створювати <span>AI-кіно</span>?</h2>
+<p>Ринок AI-контенту росте x3 щороку. Зараз — ідеальний час зайняти свою нішу, поки конкуренція мінімальна.</p>
+<a href="#products" class="btn btn-gold">Обрати свій пакет →</a>
+<div class="urgency">⚡ Ціна Early Bird діє для перших 100 учасників</div>
+</div>
+</section>
+
+<footer>
+<div class="container">
+<p>AI Cinema Academy © 2026 | Всі права захищені</p>
+</div>
+</footer>
+
+<script>
+document.querySelectorAll('.faq-q').forEach(q=>{
+q.addEventListener('click',()=>{
+const item=q.parentElement;
+document.querySelectorAll('.faq-item').forEach(i=>{if(i!==item)i.classList.remove('open')});
+item.classList.toggle('open');
+});
+});
+</script>
+</body>
+</html>
