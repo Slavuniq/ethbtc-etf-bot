@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cinema AI Mastermind — Create Hollywood-Quality AI Content</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#C9A84C;--gold-light:#E8D5A0;--gold-dark:#A8893A;--white:#FFF;--cream:#FBF8F0;--dark:#1A1A1A;--gray:#6B6B6B;--light:#F5F3EE}
+body{font-family:'Inter',sans-serif;color:var(--dark);background:var(--white);line-height:1.7}
+h1,h2,h3,h4{font-family:'Playfair Display',serif;font-weight:700}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+.gold{color:var(--gold)}
+.btn{display:inline-block;padding:16px 36px;border-radius:50px;font-size:16px;font-weight:600;text-decoration:none;text-align:center;cursor:pointer;transition:all .3s}
+.btn-gold{background:var(--gold);color:#fff}.btn-gold:hover{background:var(--gold-dark)}
+.btn-out{border:2px solid var(--gold);color:var(--gold)}.btn-out:hover{background:var(--gold);color:#fff}
+.hero{background:linear-gradient(135deg,#0D0D0D,#1A1510,#0D0D0D);color:#fff;padding:100px 0 80px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,.12),transparent 70%)}
+.hero-photos{display:flex;justify-content:center;gap:16px;margin-bottom:36px}
+.hero-photos .ph{width:100px;height:100px;border-radius:50%;border:2px solid var(--gold);object-fit:cover;background:linear-gradient(135deg,var(--gold),#333)}
+.hero-photos .ph.main{width:140px;height:140px;border-width:3px}
+.hero h1{font-size:clamp(30px,5vw,52px);line-height:1.15;margin-bottom:18px;max-width:800px;margin-left:auto;margin-right:auto}
+.hero .sub{font-size:18px;color:#aaa;max-width:600px;margin:0 auto 20px;font-weight:300}
+.hero .cred{font-size:14px;color:var(--gold);margin-bottom:30px}
+.hero-stats{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.hero-stats div{text-align:center}
+.hero-stats .n{font-family:'Playfair Display',serif;font-size:36px;color:var(--gold);font-weight:700}
+.hero-stats .l{font-size:12px;color:#888;margin-top:2px}
+.hero .cta-wrap{margin-top:36px}
+.hero .spots{margin-top:14px;color:var(--gold);font-size:14px}
+.pain{background:var(--cream);padding:80px 0}
+.pain h2{text-align:center;font-size:clamp(24px,4vw,38px);margin-bottom:10px}
+.pain .intro{text-align:center;color:var(--gray);max-width:550px;margin:0 auto 40px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.pcard{background:#fff;border-radius:16px;padding:28px;border-left:4px solid var(--gold);box-shadow:0 2px 20px rgba(0,0,0,.04)}
+.pcard h4{font-size:16px;margin-bottom:8px;font-family:'Inter',sans-serif;font-weight:600}
+.pcard p{font-size:14px;color:var(--gray)}
+.pcard .q{font-style:italic;color:var(--dark);margin-top:10px;font-size:13px;border-left:2px solid var(--gold-light);padding-left:12px}
+.trans{padding:80px 0;background:#fff}
+.trans h2{text-align:center;font-size:clamp(24px,4vw,38px);margin-bottom:40px}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:28px}
+.titem{text-align:center;padding:24px}
+.titem .ic{font-size:40px;margin-bottom:14px}
+.titem h4{font-size:17px;margin-bottom:8px}
+.titem p{font-size:14px;color:var(--gray)}
+.format{background:linear-gradient(135deg,#0D0D0D,#1A1510);color:#fff;padding:80px 0}
+.format h2{text-align:center;font-size:clamp(24px,4vw,36px);margin-bottom:14px}
+.format .sub{text-align:center;color:#aaa;max-width:600px;margin:0 auto 40px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:900px;margin:0 auto}
+.fcard{background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.3);border-radius:16px;padding:28px;text-align:center}
+.fcard .ic{font-size:36px;margin-bottom:12px}
+.fcard h4{font-size:17px;margin-bottom:8px;color:var(--gold)}
+.fcard p{font-size:14px;color:#bbb}
+.expert{padding:80px 0;background:var(--cream)}
+.expert-inner{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+.expert-img{width:100%;max-width:420px;border-radius:16px;border:2px solid var(--gold);aspect-ratio:3/4;object-fit:cover;background:linear-gradient(135deg,var(--gold),#333)}
+.expert-text h2{font-size:clamp(24px,4vw,36px);margin-bottom:20px}
+.expert-text p{font-size:15px;color:var(--gray);margin-bottom:14px}
+.expert-text .hl{color:var(--gold-dark);font-weight:600}
+.ea{display:flex;gap:28px;margin-top:20px;flex-wrap:wrap}
+.ea div{text-align:center}
+.ea .n{font-family:'Playfair Display',serif;font-size:28px;color:var(--gold-dark);font-weight:700;display:block}
+.ea .l{font-size:11px;color:var(--gray)}
+.products{padding:80px 0;background:#fff}
+.products h2{text-align:center;font-size:clamp(24px,4vw,38px);margin-bottom:10px}
+.products .intro{text-align:center;color:var(--gray);max-width:550px;margin:0 auto 40px}
+.prodgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+.prod{background:var(--cream);border-radius:20px;padding:32px 28px;position:relative;transition:transform .3s}
+.prod:hover{transform:translateY(-4px)}
+.prod.feat{border:2px solid var(--gold);background:#fff;box-shadow:0 8px 40px rgba(201,168,76,.15)}
+.prod.feat::before{content:'MOST POPULAR';position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:11px;font-weight:700;padding:5px 18px;border-radius:20px;letter-spacing:1.5px}
+.prod h3{font-size:22px;margin-bottom:4px}
+.prod .desc{font-size:13px;color:var(--gray);margin-bottom:18px}
+.prod .price{font-family:'Playfair Display',serif;font-size:40px;color:var(--gold-dark);font-weight:700}
+.prod .price-old{font-size:16px;color:#bbb;text-decoration:line-through;display:block;margin-bottom:16px}
+.prod ul{list-style:none;margin-bottom:24px}
+.prod ul li{font-size:14px;padding:7px 0;border-bottom:1px solid var(--light);padding-left:24px;position:relative}
+.prod ul li::before{content:'✓';position:absolute;left:0;color:var(--gold);font-weight:700}
+.prod .btn{width:100%}
+.value{padding:70px 0;background:var(--cream)}
+.value h2{text-align:center;font-size:clamp(22px,3.5vw,34px);margin-bottom:30px}
+.vtable{max-width:620px;margin:0 auto}
+.vrow{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #e5e0d5;font-size:15px}
+.vrow .val{font-weight:600;color:var(--gold-dark)}
+.vtotal{display:flex;justify-content:space-between;padding:18px 0;font-size:22px;font-weight:700;border-top:3px solid var(--gold)}
+.vtotal .val{color:var(--gold-dark);font-family:'Playfair Display',serif;font-size:28px}
+.vpay{text-align:center;margin-top:28px;font-size:22px}
+.vpay span{font-family:'Playfair Display',serif;font-size:48px;color:var(--gold-dark);font-weight:700}
+.vpay .save{display:block;color:var(--gold);font-size:16px;margin-top:6px}
+.bonuses{padding:70px 0;background:#fff}
+.bonuses h2{text-align:center;font-size:clamp(22px,3.5vw,34px);margin-bottom:30px}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:900px;margin:0 auto}
+.bcard{background:var(--cream);border-radius:14px;padding:24px;text-align:center;border:1px solid var(--gold-light)}
+.bcard .ic{font-size:32px;margin-bottom:10px}
+.bcard h4{font-size:15px;margin-bottom:6px}
+.bcard p{font-size:13px;color:var(--gray)}
+.bcard .val{color:var(--gold-dark);font-weight:600;font-size:14px;margin-top:8px}
+.guar{padding:70px 0;background:var(--cream);text-align:center}
+.guar h2{font-size:clamp(22px,3.5vw,32px);margin-bottom:16px}
+.guar p{max-width:600px;margin:0 auto;color:var(--gray);font-size:15px}
+.guar .badge{display:inline-block;margin-top:20px;padding:14px 32px;border:2px solid var(--gold);border-radius:50px;color:var(--gold-dark);font-weight:600}
+.social{padding:70px 0;background:#fff}
+.social h2{text-align:center;font-size:clamp(22px,3.5vw,34px);margin-bottom:30px}
+.social-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:900px;margin:0 auto}
+.social-card{background:var(--cream);border-radius:14px;padding:24px;border-left:3px solid var(--gold)}
+.social-card .stars{color:var(--gold);font-size:18px;margin-bottom:8px}
+.social-card p{font-size:14px;color:var(--dark);font-style:italic;margin-bottom:10px}
+.social-card .author{font-size:13px;color:var(--gray);font-weight:600}
+.faq{padding:70px 0;background:var(--cream)}
+.faq h2{text-align:center;font-size:clamp(22px,3.5vw,34px);margin-bottom:30px}
+.faq-list{max-width:720px;margin:0 auto}
+.fi{background:#fff;border-radius:12px;margin-bottom:10px;overflow:hidden}
+.fq{padding:18px 24px;font-weight:600;font-size:15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.fq::after{content:'+';font-size:20px;color:var(--gold)}
+.fa{padding:0 24px 18px;font-size:14px;color:var(--gray);display:none}
+.fi.open .fa{display:block}.fi.open .fq::after{content:'−'}
+.final{background:linear-gradient(135deg,#0D0D0D,#1A1510);color:#fff;padding:80px 0;text-align:center}
+.final h2{font-size:clamp(26px,4.5vw,42px);margin-bottom:16px}
+.final p{color:#aaa;max-width:550px;margin:0 auto 30px}
+.final .btn-gold{padding:18px 52px;font-size:18px}
+.final .urg{margin-top:18px;color:var(--gold);font-size:14px}
+.final .trust{margin-top:24px;font-size:12px;color:#666}
+footer{background:var(--dark);color:#555;text-align:center;padding:30px;font-size:12px}
+@media(max-width:768px){.expert-inner{grid-template-columns:1fr;text-align:center}.expert-img{margin:0 auto}.hero-stats{gap:20px}.hero-photos .ph{width:70px;height:70px}.hero-photos .ph.main{width:100px;height:100px}}
+</style>
+</head>
+<body>
+<section class="hero"><div class="container">
+<div class="hero-photos"><div class="ph"></div><div class="ph main"></div><div class="ph"></div></div>
+<h1>Learn to Create <span class="gold">Hollywood-Quality AI Cinema</span> From the Creator With 10M+ Views</h1>
+<p class="sub">The only mastermind where you create cinematic AI content LIVE alongside a top creator. Not theory. Real cinema, built in real-time.</p>
+<p class="cred">As seen creating viral AI content for 68,000+ followers from Los Angeles</p>
+<div class="hero-stats"><div><div class="n">10M+</div><div class="l">Total Views</div></div><div><div class="n">573K</div><div class="l">Likes on Top Reel</div></div><div><div class="n">68K+</div><div class="l">Followers</div></div><div><div class="n">TOP 0.1%</div><div class="l">Engagement Rate</div></div></div>
+<div class="cta-wrap"><a href="#pricing" class="btn btn-gold">Join the Mastermind →</a><p class="spots">⚡ Only 20 spots available for the next cohort</p></div>
+</div></section>
+
+<section class="pain"><div class="container">
+<h2>Sound <span class="gold">Familiar</span>?</h2>
+<p class="intro">If even one of these hits home — this mastermind was built for you.</p>
+<div class="pgrid">
+<div class="pcard"><h4>😩 "My AI content still looks amateur"</h4><p>You've spent hundreds on AI tools. Watched every tutorial. But your content still looks like AI — not cinema.</p><div class="q">"I keep generating images that look 'cool' but never 'cinematic.' What am I missing?"</div></div>
+<div class="pcard"><h4>🎬 "I can't figure out the Hollywood look"</h4><p>You see creators posting AI reels that look like movie trailers. You have the same tools. But their output is in a different league.</p><div class="q">"I've taken 3 AI courses. They all teach the same basic stuff. Where's the CINEMA?"</div></div>
+<div class="pcard"><h4>⏰ "AI moves too fast — I'm falling behind"</h4><p>Every week there's a new tool, a new creator who "gets it." The window is closing and you're still at the starting line.</p><div class="q">"By the time I master one tool, three new ones have replaced it."</div></div>
+<div class="pcard"><h4>💸 "I don't know how to monetize this"</h4><p>Brands pay $5K-$50K for AI content. You know the opportunity is massive. But you don't have the portfolio or the pitch.</p><div class="q">"I see creators getting brand deals and I don't even know where to start."</div></div>
+<div class="pcard"><h4>😔 "My content gets no traction"</h4><p>You post, you wait, you get 200 views. Meanwhile, some creators get 10 million. Same tools. Different results.</p><div class="q">"I put my soul into a reel. 47 likes. I almost quit."</div></div>
+<div class="pcard"><h4>🫣 "Clients are asking — and I can't deliver"</h4><p>Your clients want AI content. And you're terrified they'll find someone who can actually create it.</p><div class="q">"My biggest client asked for 'cinematic AI content' last week. I had to say no."</div></div>
+</div></div></section>
+
+<section class="trans"><div class="container">
+<h2>In 90 Days, <span class="gold">You Will</span></h2>
+<div class="tgrid">
+<div class="titem"><div class="ic">🎬</div><h4>Create Cinema-Grade AI Content</h4><p>Hollywood-quality reels and brand content — from your laptop. The kind that stops people mid-scroll.</p></div>
+<div class="titem"><div class="ic">💰</div><h4>Land $5K–$50K Brand Deals</h4><p>With a portfolio, pitch templates, and pricing that positions you as premium — not a commodity.</p></div>
+<div class="titem"><div class="ic">📈</div><h4>Get Millions of Views</h4><p>The viral formula behind 573K-like reels. Hooks, storytelling, audio, pacing — the complete system.</p></div>
+<div class="titem"><div class="ic">⚡</div><h4>Produce 5 Reels Per Day</h4><p>Batch-production workflow. Templates. Systems. Work like a studio, not an amateur.</p></div>
+<div class="titem"><div class="ic">🧠</div><h4>Master Every AI Tool</h4><p>Midjourney, Kling, Runway, Lovart — and whatever launches next.</p></div>
+<div class="titem"><div class="ic">🌍</div><h4>Build a Location-Free Career</h4><p>A laptop, AI tools, and your creativity. Work from anywhere, for anyone, at any price.</p></div>
+</div></div></section>
+
+<section class="format"><div class="container">
+<h2>This Is NOT <span class="gold">Another Course</span></h2>
+<p class="sub">A LIVE mastermind where you create real cinema alongside a creator with 10M+ views.</p>
+<div class="fgrid">
+<div class="fcard"><div class="ic">🔴</div><h4>LIVE Creation Sessions</h4><p>Watch your mentor create a cinematic AI clip from scratch — in real-time. The real process, unfiltered.</p></div>
+<div class="fcard"><div class="ic">🎯</div><h4>Create Alongside Her</h4><p>You don't just watch — you BUILD. Same brief, same tools. Then get direct feedback.</p></div>
+<div class="fcard"><div class="ic">💬</div><h4>Weekly Q&A Calls</h4><p>Bring your questions. Get answers from someone who's done it at the highest level.</p></div>
+</div></div></section>
+
+<section class="expert"><div class="container"><div class="expert-inner">
+<div class="expert-img"></div>
+<div class="expert-text">
+<h2>Your <span class="gold">Mentor</span></h2>
+<p>An AI Creator based in <span class="hl">Los Angeles, California</span>. She creates cinematic AI content with <span class="hl">10M+ total views</span> and reels reaching <span class="hl">573,000 likes</span>.</p>
+<p>Her content doesn't look like AI. It looks like <span class="hl">Hollywood</span>. She recreates iconic cinema — Titanic, Avatar, fantasy worlds — using AI tools and cinematic storytelling.</p>
+<p><em>"My goal is to inspire, teach, and help people unlock the magic of artificial intelligence."</em></p>
+<div class="ea"><div><span class="n">10M+</span><span class="l">Total Views</span></div><div><span class="n">573K</span><span class="l">Top Likes</span></div><div><span class="n">68K+</span><span class="l">Followers</span></div><div><span class="n">LA</span><span class="l">Based</span></div></div>
+</div></div></div></section>
+
+<section class="products" id="pricing"><div class="container">
+<h2>Choose Your <span class="gold">Level</span></h2>
+<p class="intro">Three ways to join — from self-paced to full immersion.</p>
+<div class="prodgrid">
+<div class="prod"><h3>Cinema AI Masterclass</h3><p class="desc">Self-paced recorded LIVE creation sessions</p><div class="price">$597</div><span class="price-old">$1,497</span><ul><li>12 recorded LIVE creation sessions</li><li>200+ cinematic AI prompts</li><li>Complete Notion workflow system</li><li>Private community (6 months)</li><li>Monthly updated prompt library</li><li>Viral reel formula breakdown</li></ul><a href="#" class="btn btn-out">Get Masterclass</a></div>
+<div class="prod feat"><h3>Cinema AI Mastermind</h3><p class="desc">LIVE sessions — create alongside your mentor</p><div class="price">$1,997</div><span class="price-old">$4,997</span><ul><li>Everything in Masterclass</li><li>12 LIVE group creation sessions</li><li>Weekly Q&A calls (12 weeks)</li><li>3 personal portfolio reviews</li><li>Brand deal pitch templates + pricing</li><li>Direct mentor feedback on your work</li><li>Lifetime access + all future updates</li><li>Payment plan: 3 × $697</li></ul><a href="#" class="btn btn-gold">Join the Mastermind →</a></div>
+<div class="prod"><h3>Cinema AI Inner Circle</h3><p class="desc">Private 1:1 mentorship + done-with-you portfolio</p><div class="price">$4,997</div><span class="price-old">$12,000</span><ul><li>Everything in Mastermind</li><li>6 private 1:1 sessions</li><li>Custom strategy for your niche</li><li>Done-with-you portfolio: 10 pieces</li><li>Introduction to brand contacts</li><li>Revenue share on brand deals</li><li>Lifetime VIP community</li><li>Payment plan: 6 × $897</li></ul><a href="#" class="btn btn-out">Apply for Inner Circle</a></div>
+</div></div></section>
+
+<section class="value"><div class="container">
+<h2>What You're <span class="gold">Really Getting</span></h2>
+<div class="vtable">
+<div class="vrow"><span>12 LIVE creation sessions (1:1 equivalent)</span><span class="val">$24,000</span></div>
+<div class="vrow"><span>200+ cinematic prompts library</span><span class="val">$740</span></div>
+<div class="vrow"><span>Private community (12 months)</span><span class="val">$1,164</span></div>
+<div class="vrow"><span>3 portfolio reviews</span><span class="val">$4,500</span></div>
+<div class="vrow"><span>Brand deal templates + pricing</span><span class="val">$1,997</span></div>
+<div class="vrow"><span>Weekly Q&A calls (12 weeks)</span><span class="val">$6,000</span></div>
+<div class="vtotal"><span>Total Value:</span><span class="val">$38,401</span></div>
+</div>
+<div class="vpay">You pay: <span>$1,997</span><span class="save">One brand deal pays for it all</span></div>
+</div></section>
+
+<section class="bonuses"><div class="container">
+<h2>Free <span class="gold">Bonuses</span></h2>
+<div class="bgrid">
+<div class="bcard"><div class="ic">🎁</div><h4>Secret Prompt Vault</h4><p>Exact prompts behind 500K+ like reels</p><div class="val">Value: $497</div></div>
+<div class="bcard"><div class="ic">🎥</div><h4>BTS Content Blueprint</h4><p>Create behind-the-scenes content that goes viral</p><div class="val">Value: $297</div></div>
+<div class="bcard"><div class="ic">📋</div><h4>Brand Deal Closer Kit</h4><p>Scripts, pricing calculator, contract templates</p><div class="val">Value: $997</div></div>
+<div class="bcard"><div class="ic">🔄</div><h4>Lifetime Updates</h4><p>New tools = new lessons added forever</p><div class="val">Priceless</div></div>
+</div></div></section>
+
+<section class="guar"><div class="container">
+<h2>14-Day "Create or Refund" Guarantee</h2>
+<p>Join. Attend sessions. Create your first piece. If within 14 days you don't feel it's worth 10x what you paid — get 100% back. No questions.</p>
+<div class="badge">🛡️ 100% Money-Back Guarantee</div>
+</div></section>
+
+<section class="social"><div class="container">
+<h2>What <span class="gold">Creators</span> Say</h2>
+<div class="social-grid">
+<div class="social-card"><div class="stars">★★★★★</div><p>"I went from basic AI art to content brands pay for. First client: $3,500 for one reel."</p><div class="author">— Content Creator, LA</div></div>
+<div class="social-card"><div class="stars">★★★★★</div><p>"The LIVE format is everything. Watching real decisions in real-time — no course can replicate that."</p><div class="author">— Motion Designer, NYC</div></div>
+<div class="social-card"><div class="stars">★★★★★</div><p>"Skeptical about the price. Then I landed a $8K brand deal. Best ROI ever."</p><div class="author">— Agency Owner, Austin</div></div>
+</div></div></section>
+
+<section class="faq"><div class="container">
+<h2>Frequently Asked <span class="gold">Questions</span></h2>
+<div class="faq-list">
+<div class="fi open"><div class="fq">Is this just another AI course?</div><div class="fa">No. This is a LIVE mastermind where you create real cinematic AI content alongside a creator with 10M+ views. You build together in real-time and get direct feedback.</div></div>
+<div class="fi"><div class="fq">I'm a complete beginner — will this work?</div><div class="fa">Yes. Session 1 starts from zero. By session 4, you'll create content that looks nothing like "beginner AI art."</div></div>
+<div class="fi"><div class="fq">What tools do I need?</div><div class="fa">Midjourney ($10/mo), Kling (free plan), CapCut (free). Total: $10-30/month.</div></div>
+<div class="fi"><div class="fq">Can I really make money from this?</div><div class="fa">One cinematic AI reel for a brand = $3K-$10K. One deal pays for the entire mastermind.</div></div>
+<div class="fi"><div class="fq">What if I miss a LIVE session?</div><div class="fa">Every session is recorded in full HD. Lifetime access to all recordings.</div></div>
+<div class="fi"><div class="fq">Is there a payment plan?</div><div class="fa">Yes. Mastermind: 3 × $697. Inner Circle: 6 × $897. No credit check.</div></div>
+<div class="fi"><div class="fq">How is this different from YouTube?</div><div class="fa">YouTube teaches tools. This teaches CINEMA. Plus direct feedback from someone with 10M+ views.</div></div>
+<div class="fi"><div class="fq">Refund policy?</div><div class="fa">14 days, 100% money-back, no questions asked.</div></div>
+</div></div></section>
+
+<section class="final"><div class="container">
+<h2>Ready to Create <span class="gold">AI Cinema</span>?</h2>
+<p>The AI content market grows 3x yearly. Creators who master cinematic AI NOW will own this space.</p>
+<a href="#pricing" class="btn btn-gold">Join the Mastermind →</a>
+<p class="urg">⚡ Only 20 spots — next cohort starts soon</p>
+<p class="trust">🛡️ 14-day guarantee · Secure payment · Instant access</p>
+</div></section>
+
+<footer><div class="container"><p>Cinema AI Mastermind © 2026 | All Rights Reserved</p></div></footer>
+<script>
+document.querySelectorAll('.fq').forEach(q=>{q.addEventListener('click',()=>{const i=q.parentElement;document.querySelectorAll('.fi').forEach(x=>{if(x!==i)x.classList.remove('open')});i.classList.toggle('open')})});
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'})})});
+</script>
+</body>
+</html>
