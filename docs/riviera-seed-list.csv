@@ -1,15 +1,31 @@
-name,platform,handle_or_url,lead_type,riviera_focus,us_signal,status,notes,source
-Helene in Between,Instagram/Blog,@heleneinbetween / heleneinbetween.com,A,Medium (Riviera among broader travel),American (US blogger),VERIFY,US travel blogger with French Riviera Instagrammable-places content; broad travel not pure Riviera,heleneinbetween.com
-The American in Paris,Instagram/Blog,@theamericaninparis / theamericaninparis.com,A,Medium (Paris-based, covers Nice/Monaco/Cannes),American expat,VERIFY,Did a weekend guide to Nice/Monaco/Cannes; Paris-based but Riviera content,theamericaninparis.com
-Do You France?,YouTube,Do You France? (channel),A,High,American couple moved from USA to France 2022,VERIFY,US couple relocated to France; relocation/lifestyle vlog,feedspot.com
-Karin Dodson Gignoux,Instagram,Karin Dodson Gignoux,A,High,English-speaking 10+ yr Riviera expat,VERIFY,Stories/tips for new expats & visitors to the Riviera,hotelbricegarden.com
-Ever The Wanderer,Blog,everthewanderer.com,A,Medium,English-speaking (verify US),VERIFY,Detailed South of France road-trip itinerary,everthewanderer.com
-Living on the Cote d'Azur,Blog,livingonthecotedazur.com,A,High,English-speaking expat guide,VERIFY,Expat guide to living on the Cote d'Azur,livingonthecotedazur.com
-nicefrance_life,Instagram,@nicefrance_life,A/B-source,High,Verify language/audience,VERIFY,Nice-focused IG account; check owner & audience country,instagram.com
-Nice is Love,Instagram,Nice is Love (~30k),B-source,High,English content,VERIFY,Showcases Nice; good post-engagement harvest source,home-hunts.net
-Riviera Love,Instagram,Riviera Love,B-source,High,English content,VERIFY,Arty real-moment Riviera photos; engagement source,home-hunts.net
-Experience the French Riviera,Instagram,@experiencethefrenchriviera,B-source,High,English content,VERIFY,Properties/scenes + villa rentals; audience harvest,home-hunts.net
-whoismerty,TikTok,@whoismerty,A,Medium,Verify nationality,VERIFY,South of France / Cote d'Azur TikTok content,tiktok.com
-Riviera Go!,YouTube,UCbB1fBF4NpNEaFZMGeGzoHA,B-source,High,Verify,VERIFY,Riviera-focused YouTube channel; comment harvest source,youtube.com
-Frenchly,Media/IG,frenchly.us,Partner/audience,Medium,US media about France,VERIFY,US-facing media about France; partnership + audience pool,frenchly.us
-My French Country Home Box,Blog/IG,myfrenchcountryhomebox.com,Partner/audience,Low-Med,Americans-in-France angle,VERIFY,Curates Americans-in-France accounts; sourcing hub,myfrenchcountryhomebox.com
+name,platform,handle_or_url,lead_type,riviera_focus,us_en_signal,status,notes,source
+Do You France?,YouTube,Do You France? (channel),A-creator,High,American couple moved from USA 2022,VERIFY,US relocation/lifestyle vlog — top collab candidate,feedspot.com
+Me and Mon Ami,YouTube,Me and Mon Ami,A-creator,High,English expats ~17 yrs in Villefranche-sur-Mer,VERIFY,Long-term Riviera expats; strong collab candidate,feedspot.com
+Karin Dodson Gignoux,Instagram,Karin Dodson Gignoux,A-creator,High,English-speaking 10+ yr Riviera expat,VERIFY,Expat tips/visitors to the Riviera,hotelbricegarden.com
+Emma Hepburn / Monegasque Wife,Instagram,@monegasquewife,A-creator,High (Monaco),English expat in Monaco,VERIFY,Expat life in Monaco — premium audience,favikon.com
+The American in Paris,Instagram/Blog,@theamericaninparis,A-creator,Medium,American expat,VERIFY,Paris-based; did Nice/Monaco/Cannes guide,theamericaninparis.com
+Helene in Between,Instagram/Blog,@heleneinbetween,A-creator,Medium,American blogger,VERIFY,US travel blogger w/ Riviera content,heleneinbetween.com
+Oui In France (Diane),Blog/YouTube,youtube.com/ouiinfrance,A-creator,Low-Med,American expat in France,VERIFY,US expat lifestyle; France-wide not Riviera-only,thelocal.fr
+Living on the Cote d'Azur,Blog,livingonthecotedazur.com,A-creator,High,English expat guide,VERIFY,Expat guide to living on the Cote d'Azur,livingonthecotedazur.com
+Ever The Wanderer,Blog,everthewanderer.com,A-creator,Medium,English (verify US),VERIFY,South of France itinerary,everthewanderer.com
+whoismerty,TikTok,@whoismerty,A-creator,Medium,Verify nationality,VERIFY,South of France / Cote d'Azur TikTok,tiktok.com
+nicefrance_life,Instagram,@nicefrance_life,B-source,High,Verify language/audience,VERIFY,Nice-focused; check audience country,instagram.com
+Nice is Love,Instagram,Nice is Love (~30k),B-source,High,English content,VERIFY,Showcases Nice; engagement harvest,home-hunts.net
+Riviera Love,Instagram,Riviera Love,B-source,High,English content,VERIFY,Arty Riviera photos; engagement harvest,home-hunts.net
+Experience the French Riviera,Instagram,@experiencethefrenchriviera,B-source,High,English content,VERIFY,Scenes + villa rentals; audience harvest,home-hunts.net
+Cannes Luxe,Instagram,@cannesluxe (~28k),B-source,High,English lifestyle,VERIFY,Cannes/Riviera luxury lifestyle; harvest,collabstr.com
+Riviera Go!,YouTube,UCbB1fBF4NpNEaFZMGeGzoHA,B-source,High,Verify,VERIFY,Riviera channel; comment harvest,youtube.com
+yuliamoatti_stylist,Instagram,@yuliamoatti_stylist,B-source,High,English/French,VERIFY,Cannes stylist; affluent Riviera audience,collabstr.com
+shumko_viktoria,Instagram,@shumko_viktoria,B-source,High,English/French,VERIFY,Makeup artist Monaco/Cannes/St-Tropez,collabstr.com
+Camille Gottlieb,Instagram,@camillerosegottlieb,Reach,High (Monaco),French (Grace Kelly granddaughter),VERIFY,Celebrity reach — aspirational not direct lead,starngage.com
+Yoann Proton,Instagram,@yoannproton,Reach,High (Monaco),French luxury lifestyle,VERIFY,Monaco luxury content creator,starngage.com
+Cote d'Azur Sotheby's Realty,Instagram,@cotedazursir (~18k),C-realestate,High,English,VERIFY,Competitor/partner; audience = buyers,instagram.com
+St Tropez House,Blog/IG,sttropezhouse.com,C-realestate,High,English,VERIFY,Luxury villa rentals St-Tropez; partner/competitor,sttropezhouse.com
+Le Collectionist,Web/IG,lecollectionist.com,C-realestate,High,English,VERIFY,Luxury villa rentals Riviera; competitor,lecollectionist.com
+Cap Villas,Web,capvillas.com,C-realestate,High,English,VERIFY,Riviera villas (+ St Tropez/Mougins),capvillas.com
+Collabstr — Cannes,Directory,collabstr.com/top-influencers/instagram/in/france/cannes,Directory,High,Filter by language,USE,~62-180 Cannes creators to filter,collabstr.com
+Collabstr — Saint-Tropez,Directory,collabstr.com/top-influencers/instagram/in/france/saint-tropez,Directory,High,Filter by language,USE,~89 St-Tropez creators,collabstr.com
+Favikon — Nice/Monaco,Directory,favikon.com/blog/top-nice-influencers,Directory,High,Filter,USE,Curated top Nice & Monaco influencers,favikon.com
+Modash — Monaco,Directory,modash.io/find-influencers/monaco,Directory,High,Filter by audience country=US,USE,Influencer DB w/ audience-country filter,modash.io
+StarNgage — Monaco Luxury,Directory,starngage.com/plus/en/influencer/ranking/instagram/monaco/luxury,Directory,High,Filter,USE,Ranked Monaco luxury influencers,starngage.com
+Feedspot — France travel/expats,Directory,videos.feedspot.com/france_travel_youtube_channels/,Directory,Med-High,Filter EN/US,USE,Directory of France/expat YouTubers,feedspot.com
