@@ -1,0 +1,48 @@
+name: ETF Bot (always on)
+
+# Автоматический запуск бота. Так как GitHub Actions ограничивает один прогон
+# 6 часами, мы перезапускаем бота по расписанию. Группа concurrency не даёт
+# запуститься двум копиям одновременно (иначе Telegram вернёт ошибку Conflict),
+# а очередь из следующего прогона стартует сразу после завершения текущего —
+# поэтому бот работает практически без перерывов.
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # каждые 15 минут пытаемся запустить (если не запущен)
+  workflow_dispatch:          # кнопка ручного запуска во вкладке Actions
+  push:
+    branches: [ main ]        # перезапуск после обновления кода
+
+concurrency:
+  group: etf-bot-singleton
+  cancel-in-progress: false   # пока бот работает, новый прогон ждёт в очереди
+
+permissions:
+  contents: read
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350      # жёсткий предохранитель (чуть меньше лимита GitHub в 6 ч)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run bot
+        env:
+          # Токен берётся из секрета репозитория (Settings → Secrets and
+          # variables → Actions → New repository secret, имя TELEGRAM_TOKEN).
+          # Если секрет не задан, код использует запасное значение из config.py.
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        # Работаем ~5 ч 40 мин, затем мягко останавливаемся (SIGINT), чтобы
+        # successfully завершить прогон и отдать очередь следующему запуску.
+        run: timeout --signal=SIGINT 340m python main.py || true
