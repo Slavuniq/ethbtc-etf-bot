@@ -36,8 +36,10 @@ TARGETS = [
      "https://www.gifi.fr/loisirs/sport/sport-individuel/planche-paddle-gonflable-1-personne-plastique-jaune-et-vert-365x76xep15cm/000000000000644661.html"),
     ("GIFI", "Planche paddle gonflable 320x81x15",
      "https://www.gifi.fr/loisirs/sport/sport-individuel/planche-paddle-gonflable-1-personne-motif-corail-jaune-et-bleu-320x81xep15cm/000000000000644662.html"),
-    ("DECATHLON", "Seconde Vie — paddle gonflable randonnee 10 pieds",
-     "https://secondevie.decathlon.fr/products/paddle-reconditionne-stand-up-paddle-gonflable-de-randonnee-debutant-10-pieds-rouge"),
+    ("DECATHLON", "Itiwit x100 debutant 11 pieds (neuf, ориентир)",
+     "https://www.decathlon.fr/p/stand-up-paddle-gonflable-debutant-11-pieds-bleu/_/R-p-303064"),
+    ("DECATHLON", "Seconde Vie — stand up paddle occasion",
+     "https://www.decathlon.fr/tous-les-sports/stand-up-paddle-sup/stand-up-paddle-de-seconde-vie"),
     ("DECATHLON", "Seconde Vie — liste materiel sports d'eau",
      "https://www.decathlon.fr/occasion/materiel-sports-d-eau-occasion"),
     ("CARREFOUR", "Bestway Hydro-Force Aqua Wander 305x84x12",
@@ -92,8 +94,9 @@ def parse_jsonld(page) -> tuple[str, str]:
     return price, avail
 
 
-def scan(page, store: str, name: str, url: str) -> Result:
+def scan(ctx, store: str, name: str, url: str) -> Result:
     res = Result(store=store, name=name, url=url)
+    page = ctx.new_page()
     try:
         resp = page.goto(url, timeout=60_000, wait_until="domcontentloaded")
         res.status = str(resp.status if resp else "no-response")
@@ -115,6 +118,13 @@ def scan(page, store: str, name: str, url: str) -> Result:
             res.signals.append("в-наличии-маркер")
     except Exception as exc:  # noqa: BLE001 — хотим увидеть причину в логе
         res.error = f"{type(exc).__name__}: {exc}"[:300]
+    finally:
+        # своя страница на каждую цель: незавершённая навигация одного сайта
+        # больше не срывает переход на следующий
+        try:
+            page.close()
+        except Exception:
+            pass
     return res
 
 
@@ -128,10 +138,9 @@ def main() -> int:
             timezone_id="Europe/Paris",
             viewport={"width": 1366, "height": 900},
         )
-        page = ctx.new_page()
         for store, name, url in TARGETS:
             print(f"→ {store}: {name}", flush=True)
-            results.append(scan(page, store, name, url))
+            results.append(scan(ctx, store, name, url))
         browser.close()
 
     print("\n" + "=" * 78)
