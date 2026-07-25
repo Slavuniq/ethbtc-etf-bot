@@ -1,0 +1,158 @@
+#!/usr/bin/env python3
+"""Сканер цен и наличия SUP-досок до 150 EUR в магазинах района Ниццы.
+
+Запускается в GitHub Actions: у раннера полный доступ в интернет,
+в отличие от изолированного контейнера сессии.
+
+Для каждой карточки товара снимаем:
+  - цену (JSON-LD offers.price, затем видимый текст как запасной вариант)
+  - наличие (schema.org availability + текстовые маркеры "rupture"/"epuise")
+"""
+
+from __future__ import annotations
+
+import json
+import re
+import sys
+from dataclasses import dataclass, field
+
+from playwright.sync_api import sync_playwright
+
+UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
+
+TARGETS = [
+    ("LIDL", "Crivit polyvalent gonflable (315x84x15, 140 kg)",
+     "https://www.lidl.fr/p/crivit-stand-up-paddle-polyvalent-gonflable/p100405281"),
+    ("LIDL", "Crivit polyvalent basic",
+     "https://www.lidl.fr/p/crivit-stand-up-paddle-gonflable-polyvalent-basic/p100388784"),
+    ("LIDL", "Crivit polyvalent Aquaview",
+     "https://www.lidl.fr/p/crivit-stand-up-paddle-gonflable-polyvalent-aquaview/p100405264"),
+    ("LIDL", "Crivit polyvalent + pompe et pagaie",
+     "https://www.lidl.fr/p/crivit-stand-up-paddle-polyvalent-gonflable-pompe-et-pagaie/p100405156"),
+    ("GIFI", "Paddle gonflable 274x76x10",
+     "https://www.gifi.fr/loisirs/sport/sport-individuel/paddle-gonflable-274x76xep10cm/000000000000617083.html"),
+    ("GIFI", "Planche paddle gonflable 365x76x15",
+     "https://www.gifi.fr/loisirs/sport/sport-individuel/planche-paddle-gonflable-1-personne-plastique-jaune-et-vert-365x76xep15cm/000000000000644661.html"),
+    ("GIFI", "Planche paddle gonflable 320x81x15",
+     "https://www.gifi.fr/loisirs/sport/sport-individuel/planche-paddle-gonflable-1-personne-motif-corail-jaune-et-bleu-320x81xep15cm/000000000000644662.html"),
+    ("DECATHLON", "Seconde Vie — paddle gonflable randonnee 10 pieds",
+     "https://secondevie.decathlon.fr/products/paddle-reconditionne-stand-up-paddle-gonflable-de-randonnee-debutant-10-pieds-rouge"),
+    ("DECATHLON", "Seconde Vie — liste materiel sports d'eau",
+     "https://www.decathlon.fr/occasion/materiel-sports-d-eau-occasion"),
+    ("CARREFOUR", "Bestway Hydro-Force Aqua Wander 305x84x12",
+     "https://www.carrefour.fr/p/bestway-paddle-gonflable-hydro-force-aqua-wander-305-x-84-x-12-cm-6941607334188"),
+    ("CARREFOUR", "Intex Aqua Quest 320",
+     "https://www.carrefour.fr/p/intex-aqua-quest-320-planche-sup-6941057422817"),
+]
+
+PRICE_RE = re.compile(r"(\d{1,4}[.,]\d{2})\s*(?:€|EUR)|(?:€|EUR)\s*(\d{1,4}[.,]\d{2})")
+OOS_RE = re.compile(r"rupture|épuisé|epuise|indisponible|out of stock|sold\s*out", re.I)
+INSTOCK_RE = re.compile(r"ajouter au panier|add to cart|en stock|disponible", re.I)
+
+
+@dataclass
+class Result:
+    store: str
+    name: str
+    url: str
+    status: str = "?"
+    jsonld_price: str = ""
+    jsonld_avail: str = ""
+    text_prices: list = field(default_factory=list)
+    signals: list = field(default_factory=list)
+    error: str = ""
+
+
+def parse_jsonld(page) -> tuple[str, str]:
+    """Достаёт price / availability из любого блока schema.org Product."""
+    price = avail = ""
+    for handle in page.query_selector_all('script[type="application/ld+json"]'):
+        raw = handle.inner_text() or ""
+        try:
+            data = json.loads(raw)
+        except Exception:
+            continue
+        stack = [data]
+        while stack:
+            node = stack.pop()
+            if isinstance(node, list):
+                stack.extend(node)
+                continue
+            if not isinstance(node, dict):
+                continue
+            offers = node.get("offers")
+            if offers:
+                stack.append(offers)
+            if "price" in node and not price:
+                price = str(node["price"])
+            if "availability" in node and not avail:
+                avail = str(node["availability"]).rsplit("/", 1)[-1]
+            stack.extend(v for v in node.values() if isinstance(v, (dict, list)))
+    return price, avail
+
+
+def scan(page, store: str, name: str, url: str) -> Result:
+    res = Result(store=store, name=name, url=url)
+    try:
+        resp = page.goto(url, timeout=60_000, wait_until="domcontentloaded")
+        res.status = str(resp.status if resp else "no-response")
+        page.wait_for_timeout(3500)  # даём догрузиться цене
+
+        res.jsonld_price, res.jsonld_avail = parse_jsonld(page)
+
+        body = page.inner_text("body")[:200_000]
+        found = []
+        for m in PRICE_RE.finditer(body):
+            found.append((m.group(1) or m.group(2)).replace(",", "."))
+        # уникальные, отсортированные по величине, только правдоподобные
+        vals = sorted({float(v) for v in found if 5.0 <= float(v) <= 2000.0})
+        res.text_prices = [f"{v:.2f}" for v in vals[:12]]
+
+        if OOS_RE.search(body):
+            res.signals.append("OOS-маркер")
+        if INSTOCK_RE.search(body):
+            res.signals.append("в-наличии-маркер")
+    except Exception as exc:  # noqa: BLE001 — хотим увидеть причину в логе
+        res.error = f"{type(exc).__name__}: {exc}"[:300]
+    return res
+
+
+def main() -> int:
+    results: list[Result] = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch(args=["--disable-blink-features=AutomationControlled"])
+        ctx = browser.new_context(
+            user_agent=UA,
+            locale="fr-FR",
+            timezone_id="Europe/Paris",
+            viewport={"width": 1366, "height": 900},
+        )
+        page = ctx.new_page()
+        for store, name, url in TARGETS:
+            print(f"→ {store}: {name}", flush=True)
+            results.append(scan(page, store, name, url))
+        browser.close()
+
+    print("\n" + "=" * 78)
+    print("РЕЗУЛЬТАТ СКАНИРОВАНИЯ")
+    print("=" * 78)
+    for r in results:
+        print(f"\n[{r.store}] {r.name}")
+        print(f"  HTTP        : {r.status}")
+        if r.error:
+            print(f"  ОШИБКА      : {r.error}")
+            continue
+        print(f"  JSON-LD цена: {r.jsonld_price or '—'}")
+        print(f"  JSON-LD нал.: {r.jsonld_avail or '—'}")
+        print(f"  Цены в тексте: {', '.join(r.text_prices) if r.text_prices else '—'}")
+        print(f"  Сигналы     : {', '.join(r.signals) if r.signals else '—'}")
+
+    with open("sup_scan_results.json", "w", encoding="utf-8") as fh:
+        json.dump([r.__dict__ for r in results], fh, ensure_ascii=False, indent=2)
+    print("\nСохранено в sup_scan_results.json")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

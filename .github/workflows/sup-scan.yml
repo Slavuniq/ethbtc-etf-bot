@@ -1,0 +1,39 @@
+name: SUP price scan (Nice)
+
+on:
+  push:
+    branches: [claude/sup-nice-scan-gnltnf]
+    paths:
+      - scripts/sup_scan.py
+      - .github/workflows/sup-scan.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Playwright
+        run: |
+          pip install --quiet playwright
+          playwright install --with-deps chromium
+
+      - name: Scan stores
+        run: python scripts/sup_scan.py
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sup-scan-results
+          path: sup_scan_results.json
+          if-no-files-found: warn
