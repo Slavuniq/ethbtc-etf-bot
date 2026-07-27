@@ -7,6 +7,11 @@ on:
       - scripts/sup_scan.py
       - .github/workflows/sup-scan.yml
   workflow_dispatch:
+    inputs:
+      short_url:
+        description: Короткая ссылка для разворачивания (напр. maps.app.goo.gl)
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -26,6 +31,13 @@ jobs:
         run: |
           pip install --quiet playwright
           playwright install --with-deps chromium
+
+      - name: Resolve short link
+        env:
+          SHORT_URL: ${{ inputs.short_url || 'https://maps.app.goo.gl/3Ugsf87MSXqpS99r7' }}
+        run: |
+          echo "Разворачиваю: $SHORT_URL"
+          curl -sSIL "$SHORT_URL" | grep -iE '^(location:|HTTP/)' || true
 
       - name: Scan stores
         run: python scripts/sup_scan.py
