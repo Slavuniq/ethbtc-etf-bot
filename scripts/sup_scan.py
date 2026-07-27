@@ -92,6 +92,17 @@ TARGETS = [
      "https://www.idealo.fr/cat/28644F7420876/stand-up-paddle.html?max=100"),
     ("IDEALO", "SUP, сортировка по цене",
      "https://www.idealo.fr/cat/28644/stand-up-paddle.html?sortKey=minPrice"),
+    # проверка скидки -25% на Crivit polyvalent: источники, где она была заявлена
+    ("PROMO-123", "Crivit polyvalent -25%",
+     "https://www.123catalogue.fr/catalogue/lidl/crivit-stand-up-paddle-polyvalent-gonflable-695260"),
+    ("PROMO-123", "Stand Up Paddle Polyvalent",
+     "https://www.123catalogue.fr/catalogue/lidl/stand-up-paddle-polyvalent-gonflable-328850"),
+    ("PROMO-123", "Stand Up Paddle Gonflable",
+     "https://www.123catalogue.fr/catalogue/lidl/stand-up-paddle-gonflable-284699"),
+    ("PROMOCATALOGUES", "Crivit chez Lidl",
+     "https://www.promocatalogues.fr/offres/crivit/lidl"),
+    ("PROMOS.FR", "Crivit polyvalent (акция 79 EUR)",
+     "https://www.promos.fr/lidl/crivit-stand-up-paddle-polyvalent-gonflable-a-79eur-932436"),
 ]
 
 PRICE_RE = re.compile(r"(\d{1,4}[.,]\d{2})\s*(?:€|EUR)|(?:€|EUR)\s*(\d{1,4}[.,]\d{2})")
