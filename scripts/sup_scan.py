@@ -68,6 +68,26 @@ TARGETS = [
      "https://www.leboncoin.fr/recherche?text=itiwit&price=min-130"),
     ("CAMPSIDER", "paddle gonflable occasion",
      "https://campsider.com/sports-nautiques/equipement-paddle/paddle-gonflable-occasion"),
+    # крупные сети — поиск по сайту
+    ("E.LECLERC", "поиск: paddle gonflable",
+     "https://www.e.leclerc/recherche?q=paddle+gonflable"),
+    ("INTERMARCHE", "поиск: paddle",
+     "https://www.intermarche.com/recherche?q=paddle"),
+    ("AUCHAN", "поиск: paddle gonflable",
+     "https://www.auchan.fr/recherche?text=paddle+gonflable"),
+    ("SUPER U", "поиск: paddle",
+     "https://www.coursesu.com/recherche?q=paddle"),
+    ("MONOPRIX", "поиск: paddle",
+     "https://www.monoprix.fr/courses/recherche?q=paddle"),
+    ("CORA", "поиск: paddle",
+     "https://www.cora.fr/recherche?q=paddle"),
+    ("ALDI", "поиск: paddle",
+     "https://www.aldi.fr/resultats-de-recherche.html?q=paddle"),
+    # агрегаторы цен — ловят скидки по всем продавцам сразу
+    ("IDEALO", "SUP до 100 EUR",
+     "https://www.idealo.fr/cat/28644F7420876/stand-up-paddle.html?max=100"),
+    ("IDEALO", "SUP, сортировка по цене",
+     "https://www.idealo.fr/cat/28644/stand-up-paddle.html?sortKey=minPrice"),
 ]
 
 PRICE_RE = re.compile(r"(\d{1,4}[.,]\d{2})\s*(?:€|EUR)|(?:€|EUR)\s*(\d{1,4}[.,]\d{2})")
