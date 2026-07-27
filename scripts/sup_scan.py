@@ -59,6 +59,15 @@ TARGETS = [
      "https://shop.action.com/fr-be/p/8719407071897/stand-up-paddle-gonflable-q4life"),
     ("CDISCOUNT", "Bestway Aqua Journey SUP",
      "https://www.cdiscount.com/le-sport/surf-shop/bestway-paddle-aqua-journey-sup-avec-rame-et-acces/f-1213122-65302.html"),
+    # б/у: Leboncoin по департаменту 06, потолок 130 EUR
+    ("LEBONCOIN", "paddle, 06, <=130 EUR",
+     "https://www.leboncoin.fr/recherche?text=paddle&locations=d_06&price=min-130"),
+    ("LEBONCOIN", "paddle gonflable, 06",
+     "https://www.leboncoin.fr/recherche?text=paddle%20gonflable&locations=d_06"),
+    ("LEBONCOIN", "Itiwit б/у, вся Франция",
+     "https://www.leboncoin.fr/recherche?text=itiwit&price=min-130"),
+    ("CAMPSIDER", "paddle gonflable occasion",
+     "https://campsider.com/sports-nautiques/equipement-paddle/paddle-gonflable-occasion"),
 ]
 
 PRICE_RE = re.compile(r"(\d{1,4}[.,]\d{2})\s*(?:€|EUR)|(?:€|EUR)\s*(\d{1,4}[.,]\d{2})")
