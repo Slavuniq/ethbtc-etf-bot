@@ -71,6 +71,10 @@ TARGETS = [
     # крупные сети — поиск по сайту
     ("E.LECLERC", "поиск: paddle gonflable",
      "https://www.e.leclerc/recherche?q=paddle+gonflable"),
+    ("E.LECLERC", "раздел: planche de paddle",
+     "https://www.e.leclerc/cat/planche-de-paddle"),
+    ("E.LECLERC", "раздел: stand-up paddle",
+     "https://www.e.leclerc/cat/paddle"),
     ("INTERMARCHE", "поиск: paddle",
      "https://www.intermarche.com/recherche?q=paddle"),
     ("AUCHAN", "поиск: paddle gonflable",
@@ -147,6 +151,19 @@ def scan(ctx, store: str, name: str, url: str) -> Result:
         res.jsonld_price, res.jsonld_avail = parse_jsonld(page)
 
         body = page.inner_text("body")[:200_000]
+
+        # для страниц поиска: вытаскиваем название рядом с ценой,
+        # иначе непонятно, к чему относится дешёвый ценник
+        for m in PRICE_RE.finditer(body):
+            val = (m.group(1) or m.group(2)).replace(",", ".")
+            try:
+                if float(val) > 130:
+                    continue
+            except ValueError:
+                continue
+            ctx = body[max(0, m.start() - 160):m.start()].replace("\n", " | ").strip()
+            res.signals.append(f"<=130EUR {val} ← ...{ctx[-140:]}")
+
         found = []
         for m in PRICE_RE.finditer(body):
             found.append((m.group(1) or m.group(2)).replace(",", "."))
