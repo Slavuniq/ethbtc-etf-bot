@@ -46,6 +46,19 @@ TARGETS = [
      "https://www.carrefour.fr/p/bestway-paddle-gonflable-hydro-force-aqua-wander-305-x-84-x-12-cm-6941607334188"),
     ("CARREFOUR", "Intex Aqua Quest 320",
      "https://www.carrefour.fr/p/intex-aqua-quest-320-planche-sup-6941057422817"),
+    # дискаунтеры — магазины есть в Ницце и Сен-Лоран-дю-Вар
+    ("STOKOMANI", "Paddle gonflable rouge",
+     "https://www.stokomani.fr/paddle-gonflable-rouge.html"),
+    ("STOKOMANI", "поиск: paddle",
+     "https://www.stokomani.fr/catalogsearch/result/?q=paddle"),
+    ("FOIR'FOUILLE", "поиск: paddle",
+     "https://www.lafoirfouille.fr/catalogsearch/result/?q=paddle"),
+    ("CENTRAKOR", "поиск: paddle",
+     "https://www.centrakor.com/catalogsearch/result/?q=paddle"),
+    ("ACTION", "Stand up paddle gonflable Q4Life",
+     "https://shop.action.com/fr-be/p/8719407071897/stand-up-paddle-gonflable-q4life"),
+    ("CDISCOUNT", "Bestway Aqua Journey SUP",
+     "https://www.cdiscount.com/le-sport/surf-shop/bestway-paddle-aqua-journey-sup-avec-rame-et-acces/f-1213122-65302.html"),
 ]
 
 PRICE_RE = re.compile(r"(\d{1,4}[.,]\d{2})\s*(?:€|EUR)|(?:€|EUR)\s*(\d{1,4}[.,]\d{2})")
