@@ -1,1 +1,5 @@
-TOKEN = "8439594417:AAGGgPPIFf1drF2MSCph60kQ_FG-EB6Kr1E"
+import os
+
+TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+if not TOKEN:
+    raise RuntimeError("Задайте переменную окружения TELEGRAM_BOT_TOKEN (токен бота из @BotFather)")
